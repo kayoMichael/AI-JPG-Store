@@ -57,6 +57,7 @@ export default [
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': 'warn',
+      'no-undef': 'warn',
 
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
@@ -78,6 +79,12 @@ export default [
       'prefer-const': 'error',
       'no-var': 'error',
       eqeqeq: ['error', 'always'],
+    },
+  },
+  {
+    files: ['**/tailwind.config.js'],
+    rules: {
+      'no-undef': 'off',
     },
   },
 ];

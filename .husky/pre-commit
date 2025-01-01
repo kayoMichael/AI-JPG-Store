@@ -1,16 +1,2 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-current_dir=$(git rev-parse --show-prefix)
-
-current_dir=${current_dir%/}
-
-if [ -z "$current_dir" ]; then
-  npx lint-staged
-elif [ "$current_dir" = "client" ]; then
-  cd client && npx lint-staged
-elif [ "$current_dir" = "api" ]; then
-  cd api && npx lint-staged
-else
-  echo "Committing from $current_dir. No specific lint-staged configuration."
-fi
+pnpm lint-staged

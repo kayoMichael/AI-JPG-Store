@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -44,7 +45,13 @@ const SignUp = () => {
       return;
     }
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await axios.post(
+        '/auth/register',
+        { name: data.name, email: data.email, password: data.password },
+        {
+          withCredentials: true,
+        }
+      );
     } catch {
       setErrors((prev) => ({ ...prev, internal: 'An error occurred' }));
     } finally {

@@ -27,7 +27,11 @@
   },
   "lint-staged": {
     "client/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
+      "eslint --config ./client/.eslintrc.cjs --fix",
+      "prettier --write"
+    ],
+    "server/**/*.{js,ts}": [
+      "eslint --config ./server/.eslintrc.cjs --fix",
       "prettier --write"
     ],
     "**/*.{json,md}": [

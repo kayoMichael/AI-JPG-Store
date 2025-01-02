@@ -1,14 +1,18 @@
 import { Route, Routes } from 'react-router-dom';
 
-import Navbar from './components/Navbar';
+import Layout from './Layout';
+import Login from './pages/Login';
+import SignUp from './pages/Signup';
 
 function App() {
   return (
     <>
-      <Navbar />
       <Routes>
-        <Route index element={<h2></h2>} />
-        <Route path="/recent" element={<div>Recent</div>} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<h2></h2>} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
       </Routes>
     </>
   );

@@ -1,5 +1,5 @@
 /** @type {import('eslint').Linter.Config} */
-module.exports = {
+module.exports = {// eslint-disable-line no-undef
   env: {
     node: true,
     es6: true

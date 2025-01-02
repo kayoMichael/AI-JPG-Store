@@ -1,10 +1,11 @@
 import cors from 'cors';
 import express from 'express';
+import Jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 
-import { env } from './config/env';
-import UserModel from './models/UserModel';
-import { comparePassword, hashPassword } from './utils/password';
+import { env } from './config/env.js';
+import UserModel from './models/UserModel.js';
+import { comparePassword, hashPassword } from './utils/password.js';
 
 const app = express();
 app.use(
@@ -39,7 +40,10 @@ app.post('/auth/signin', async (req, res) => {
     } else {
       const isValidPassword = await comparePassword(password, user.password);
       if (isValidPassword) {
-        res.status(200).json({ user });
+        Jwt.sign({ email: user.email, id: user._id }, env.JWT_SECRET_KEY, {}, (err, token) => {
+          if (err) throw err;
+          res.status(200).cookie('token', token).json({ user });
+        });
       } else {
         res.status(401).json({ error: 'Invalid email or password' });
       }

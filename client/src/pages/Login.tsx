@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Logo from '../components/common/Logo';
 import Spinner from '../components/common/Spinner';
@@ -15,6 +15,7 @@ type FormErrors = {
 const Login = () => {
   const [Loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,11 +40,11 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post('/auth/signin', {
+      await axios.post('/auth/signin', {
         email: data.email,
         password: data.password,
       });
-      console.log(res);
+      navigate('/', { replace: true });
     } catch {
       setErrors((prev) => ({
         ...prev,

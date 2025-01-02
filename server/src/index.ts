@@ -1,15 +1,10 @@
-import path from 'path';
-
 import cors from 'cors';
-import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 
 import { env } from './config/env';
 import UserModel from './models/UserModel';
-import { hashPassword } from './utils/password';
-
-dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+import { comparePassword, hashPassword } from './utils/password';
 
 const app = express();
 app.use(
@@ -35,7 +30,24 @@ app.post('/auth/register', async (req, res) => {
   }
 });
 
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.post('/auth/signin', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      const isValidPassword = await comparePassword(password, user.password);
+      if (isValidPassword) {
+        res.status(200).json({ user });
+      } else {
+        res.status(401).json({ error: 'Invalid email or password' });
+      }
+    }
+  } catch (error) {
+    res.status(402).json({ error });
+  }
 });
+
+const PORT = 8000;
+app.listen(PORT, () => {});

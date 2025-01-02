@@ -1,5 +1,5 @@
 /** @type {import('eslint').Linter.Config} */
-module.exports = {// eslint-disable-line no-undef
+module.exports = { //eslint-disable-line
   env: {
     node: true,
     es6: true
@@ -7,7 +7,8 @@ module.exports = {// eslint-disable-line no-undef
   parser: '@typescript-eslint/parser',
   extends: [
     'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended'
+    'plugin:prettier/recommended',
+    'plugin:import/typescript'
   ],
   parserOptions: {
     ecmaVersion: 2020,
@@ -18,6 +19,17 @@ module.exports = {// eslint-disable-line no-undef
     '@typescript-eslint',
     'prettier'
   ],
+  settings: {
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json'
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
+      }
+    }
+  },
   rules: {
     'prettier/prettier': 'error',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

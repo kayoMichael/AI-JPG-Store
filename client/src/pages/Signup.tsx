@@ -45,15 +45,13 @@ const SignUp = () => {
       return;
     }
     try {
-      await axios.post(
-        '/auth/register',
-        { name: data.name, email: data.email, password: data.password },
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.post('/auth/register', {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
     } catch {
-      setErrors((prev) => ({ ...prev, internal: 'An error occurred' }));
+      setErrors((prev) => ({ ...prev, email: 'This Email is Already Registered. Please Sign In' }));
     } finally {
       eventContext.reset();
       setLoading(false);

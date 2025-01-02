@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import SignUp from './pages/Signup';
 
 axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.withCredentials = true;
 
 function App() {
   return (

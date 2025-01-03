@@ -4,9 +4,13 @@
   "description": "",
   "type": "module",
   "main": "index.js",
+  "engines": {
+    "node": "22.12.0"
+  },
   "scripts": {
-    "dev": "nodemon --exec node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/index.ts",
+    "dev": "tsc --noEmit && node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only ./src/index.ts",
     "build": "tsc",
+    "lint": "tsc --noEmit",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -19,19 +23,20 @@
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.1",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^22.10.3",
+    "@types/lodash": "^4.17.13",
+    "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^8.19.0",
     "@typescript-eslint/parser": "^8.19.0",
     "eslint": "^8.57.1",
     "eslint-import-resolver-typescript": "^3.7.0",
     "globals": "^15.9.0",
     "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.3",
+    "typescript": "^5.7.2",
     "typescript-eslint": "^8.0.1"
   },
   "dependencies": {
-    "@types/lodash": "^4.17.13",
     "bcrypt": "^5.1.1",
     "connect-redis": "^8.0.1",
     "cors": "^2.8.5",
@@ -41,7 +46,6 @@
     "ioredis": "^5.4.2",
     "mongoose": "^8.9.3",
     "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2",
     "zod": "^3.24.1"
   }
 }

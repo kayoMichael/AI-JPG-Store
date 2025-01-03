@@ -18,6 +18,11 @@ const redisClient = new Redis({
   password: env.REDIS_PASSWORD,
 });
 
+redisClient.on('error', (err) => {
+  console.error('Redis connection error:', err);
+  process.exit(1);
+});
+
 app.use(
   session({
     store: new RedisStore({ client: redisClient }),
@@ -44,6 +49,11 @@ app.use(
 app.use(express.json());
 
 mongoose.connect(env.MONGO_DB_CONNECTION_KEY);
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+  process.exit(1);
+});
 
 app.post('/auth/register', async (req, res) => {
   const { name, email, password } = req.body;

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../components/common/Logo';
 import Spinner from '../components/common/Spinner';
 import InputField from '../components/layout/InputField';
+import { useAuth } from '../context/AuthContext';
 
 type FormErrors = {
   email?: string;
@@ -16,6 +17,7 @@ const Login = () => {
   const [Loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
+  const setAuth = useAuth((state) => state.setAuth);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,10 +42,12 @@ const Login = () => {
     }
 
     try {
-      await axios.post('/auth/signin', {
+      const authentication = await axios.post('/auth/signin', {
         email: data.email,
         password: data.password,
       });
+      console.log(authentication.data);
+      setAuth(authentication.data);
       navigate('/', { replace: true });
     } catch {
       setErrors((prev) => ({

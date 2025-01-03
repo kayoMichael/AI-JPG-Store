@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useAuth } from '../../context/AuthContext';
 import Logo from '../common/Logo';
 import Container from '../container/Container';
 
@@ -19,7 +20,8 @@ const NavButton = ({ children }: { children: React.ReactNode }) => (
 
 const Navbar = () => {
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
-
+  const user = useAuth((state) => state.user);
+  console.log(user);
   return (
     <header className="border-b">
       <Container className="flex items-center justify-between">
@@ -74,27 +76,59 @@ const Navbar = () => {
                 />
               </svg>
             </button>
-            {isDropDownOpen && (
-              <div
-                id="dropdownAvatar"
-                className="absolute left-1/2 transform -translate-x-1/2 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
-              >
-                <Link
-                  to={'/login'}
-                  className="block px-4 py-3 text-sm text-gray-900 dark:text-white hover:bg-gray-100"
-                  onClick={() => setIsDropDownOpen(false)}
+            {isDropDownOpen &&
+              (!user ? (
+                <div
+                  id="dropdownAvatar"
+                  className="absolute left-1/2 transform -translate-x-1/2 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
                 >
-                  <div>Sign Up</div>
-                </Link>
-                <Link
-                  to={'/login'}
-                  className="block px-4 py-3 text-sm text-gray-900 dark:text-white hover:bg-gray-100"
-                  onClick={() => setIsDropDownOpen(false)}
+                  <Link
+                    to={'/login'}
+                    className="block px-4 py-3 text-sm text-gray-900 dark:text-white hover:bg-gray-100"
+                    onClick={() => setIsDropDownOpen(false)}
+                  >
+                    <div>Sign Up</div>
+                  </Link>
+                  <Link
+                    to={'/login'}
+                    className="block px-4 py-3 text-sm text-gray-900 dark:text-white hover:bg-gray-100"
+                    onClick={() => setIsDropDownOpen(false)}
+                  >
+                    <div>Log In</div>
+                  </Link>
+                </div>
+              ) : (
+                <div
+                  id="dropdownAvatar"
+                  className="absolute left-1/2 transform -translate-x-1/2 mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
                 >
-                  <div>Log In</div>
-                </Link>
-              </div>
-            )}
+                  <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                    <div>{user.name}</div>
+                    <div className="font-medium truncate">{user.email}</div>
+                  </div>
+                  <ul
+                    className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                    aria-labelledby="dropdownUserAvatarButton"
+                  >
+                    <li>
+                      <a
+                        href="#"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        Settings
+                      </a>
+                    </li>
+                  </ul>
+                  <div className="py-2">
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    >
+                      Sign out
+                    </a>
+                  </div>
+                </div>
+              ))}
           </div>
         </nav>
       </Container>

@@ -21,7 +21,6 @@ const NavButton = ({ children }: { children: React.ReactNode }) => (
 const Navbar = () => {
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const user = useAuth((state) => state.user);
-  console.log(user);
   return (
     <header className="border-b">
       <Container className="flex items-center justify-between">
@@ -120,12 +119,12 @@ const Navbar = () => {
                     </li>
                   </ul>
                   <div className="py-2">
-                    <a
-                      href="#"
+                    <Link
+                      to={'/signout'}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                     >
                       Sign out
-                    </a>
+                    </Link>
                   </div>
                 </div>
               ))}

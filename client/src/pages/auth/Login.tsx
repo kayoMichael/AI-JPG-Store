@@ -2,10 +2,10 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import Logo from '../components/common/Logo';
-import Spinner from '../components/common/Spinner';
-import InputField from '../components/layout/InputField';
-import { useAuth } from '../context/AuthContext';
+import Logo from '../../components/common/Logo';
+import Spinner from '../../components/common/Spinner';
+import InputField from '../../components/layout/InputField';
+import { useAuth } from '../../context/AuthContext';
 
 type FormErrors = {
   email?: string;

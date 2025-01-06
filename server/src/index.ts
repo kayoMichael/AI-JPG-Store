@@ -1,6 +1,6 @@
 import { RedisStore } from 'connect-redis';
 import cors from 'cors';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import Redis from 'ioredis';
 import mongoose from 'mongoose';
@@ -16,16 +16,26 @@ const redisClient = new Redis({
   port: env.REDIS_PORT,
   username: env.REDIS_USERNAME,
   password: env.REDIS_PASSWORD,
+  retryStrategy: function (times) {
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+  maxRetriesPerRequest: 3,
 });
 
 redisClient.on('error', (err) => {
   console.error('Redis connection error:', err);
-  process.exit(1);
+  setTimeout(() => {
+    process.exit(1);
+  }, 5000);
 });
 
 app.use(
   session({
-    store: new RedisStore({ client: redisClient }),
+    name: 'session',
+    store: new RedisStore({
+      client: redisClient,
+    }),
     secret: env.SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: false,
@@ -61,7 +71,8 @@ app.post('/auth/register', async (req, res) => {
     const user = await UserModel.create({ name, email, password: await hashPassword(password) });
     res.status(201).json({ user });
   } catch (error) {
-    res.status(402).json({ error });
+    console.log(error);
+    res.status(402).json({ message: 'Login failed. Please try again.' });
   }
 });
 
@@ -85,11 +96,12 @@ app.post('/auth/signin', async (req, res) => {
           id: user._id,
         });
       } else {
-        res.status(401).json({ error: 'Invalid email or password' });
+        res.status(400).json({ error: 'Invalid email or password' });
       }
     }
   } catch (error) {
-    res.status(402).json({ error });
+    console.log(error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -111,5 +123,24 @@ app.post('/auth/logout', (req, res) => {
   });
 });
 
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    message: 'An unexpected error occurred',
+  });
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 const PORT = 8000;
-app.listen(PORT, () => {});
+const server = app.listen(PORT, () => {});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  // Gracefully shutdown
+  server.close(() => {
+    process.exit(1);
+  });
+});

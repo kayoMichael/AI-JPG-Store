@@ -4,8 +4,9 @@ import { Route, Routes } from 'react-router-dom';
 
 import Layout from './Layout';
 import { useAuth } from './context/AuthContext';
-import Login from './pages/Login';
-import SignUp from './pages/Signup';
+import Login from './pages/auth/Login';
+import Signout from './pages/auth/Signout';
+import SignUp from './pages/auth/Signup';
 
 axios.defaults.baseURL = 'http://localhost:8000';
 axios.defaults.withCredentials = true;
@@ -30,6 +31,7 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/signout" element={<Signout />} />
       </Routes>
     </>
   );

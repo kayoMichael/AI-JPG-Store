@@ -2,9 +2,9 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import Logo from '../components/common/Logo';
-import Spinner from '../components/common/Spinner';
-import InputField from '../components/layout/InputField';
+import Logo from '../../components/common/Logo';
+import Spinner from '../../components/common/Spinner';
+import InputField from '../../components/layout/InputField';
 
 type FormErrors = {
   name?: string;

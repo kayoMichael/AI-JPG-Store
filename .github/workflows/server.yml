@@ -1,13 +1,14 @@
-name: Client CI
+name: Server CI
+
 on:
   push:
     branches: [ "main" ]
     paths:
-      - 'client/**'
+      - 'server/**'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'client/**'
+      - 'server/**'
 
 jobs:
   build:
@@ -26,12 +27,11 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
           cache-dependency-path: 'pnpm-lock.yaml'
-          
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         
       - name: Build client
-        run: pnpm --filter client build
+        run: pnpm --filter server build
         
       - name: Lint client
-        run: pnpm --filter client lint
+        run: pnpm --filter server lint

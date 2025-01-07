@@ -50,8 +50,9 @@ const Profile = ({ user }: Props) => {
           </>
         ) : (
           <>
-            {' '}
-            <DropdownMenuItem>Sign In</DropdownMenuItem>
+            <Link to={'/login'}>
+              <DropdownMenuItem>Sign In</DropdownMenuItem>
+            </Link>
           </>
         )}
       </DropdownMenuContent>

@@ -1,0 +1,42 @@
+# ============================
+# Base Stage: Install dependencies
+# ============================
+FROM node:22.12.0 AS base
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+
+# ============================
+# Development Stage
+# ============================
+FROM base AS development
+ENV NODE_ENV=development
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
+
+# ============================
+# Build Stage: Compile TypeScript
+# ============================
+FROM base AS builder
+COPY . .
+RUN npm run build
+
+# ============================
+# Production Stage: Build and Run
+# ============================
+FROM node:22.12.0-alpine AS production
+WORKDIR /app
+
+RUN addgroup -g 1001 appgroup && \
+    adduser -u 1001 -G appgroup -D evergarden
+
+COPY package.json ./
+RUN npm install --ignore-scripts --production
+COPY --from=builder /app/dist ./dist
+
+RUN chown -R evergarden:appgroup /app
+
+USER evergarden
+
+EXPOSE 3000
+CMD ["node", "dist/index.js"]

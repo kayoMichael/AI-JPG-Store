@@ -1,0 +1,36 @@
+services:
+  client:
+    build:
+      context: ./client
+      target: development
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - server
+    networks:
+      - app-network
+
+  server:
+    build:
+      context: ./server
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./server/.env.local
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

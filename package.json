@@ -28,10 +28,12 @@
   },
   "lint-staged": {
     "client/**/*.{js,jsx,ts,tsx}": [
+      "pnpm --filter client lint",
       "eslint --config ./client/.eslintrc.cjs --fix",
       "prettier --write"
     ],
     "server/**/*.{js,ts}": [
+      "pnpm --filter server lint",
       "eslint --config ./server/.eslintrc.cjs --fix",
       "prettier --write"
     ],

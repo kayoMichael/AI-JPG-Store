@@ -18,7 +18,9 @@ function App() {
       try {
         const response = await axios.get('/auth/check');
         setAuth(response.data.user);
-      } catch {}
+      } catch {
+        setAuth(null);
+      }
     };
 
     checkAuth();
@@ -32,6 +34,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signout" element={<Signout />} />
+        <Route path="/account" element={<h2>Account</h2>} />
       </Routes>
     </>
   );

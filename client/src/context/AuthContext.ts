@@ -2,10 +2,10 @@ import { create } from 'zustand';
 
 interface AuthState {
   user: User | null;
-  setAuth: (user: User) => void;
+  setAuth: (user: User | null) => void;
 }
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -13,9 +13,8 @@ interface User {
 
 export const useAuth = create<AuthState>((set) => ({
   user: null,
-  setAuth: (user: User) =>
-    set((state) => ({
-      ...state,
+  setAuth: (user: User | null) =>
+    set({
       user,
-    })),
+    }),
 }));

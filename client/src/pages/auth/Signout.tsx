@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import Logo from '../../components/common/Logo';
 import Spinner from '../../components/common/Spinner';
 
+import { Button } from '@/components/ui/button';
+
 const Signout = () => {
   const [Loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -32,11 +34,7 @@ const Signout = () => {
         </h2>
       </div>
       <div className="flex justify-center mt-6">
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 flex"
-        >
+        <Button onClick={handleLogout}>
           {Loading ? (
             <>
               <Spinner className="inline w-5 h-5 mr-2 fill-primary-300" /> Processing...
@@ -44,7 +42,7 @@ const Signout = () => {
           ) : (
             'Sign out'
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

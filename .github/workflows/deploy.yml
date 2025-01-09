@@ -71,7 +71,7 @@ jobs:
             --cache-from ${{ env.SERVER_IMAGE }}:latest \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             -t ${{ env.SERVER_IMAGE }}:${{ needs.set-environment.outputs.image_tag }} \
-            -f server/dockerfile .
+            -f server/dockerfile ./server
           docker push ${{ env.SERVER_IMAGE }}:${{ needs.set-environment.outputs.image_tag }}
 
       - name: Deploy Server to Cloud Run
@@ -134,7 +134,7 @@ jobs:
             --cache-from ${{ env.CLIENT_IMAGE }}:latest \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             -t ${{ env.CLIENT_IMAGE }}:${{ needs.set-environment.outputs.image_tag }} \
-            -f client/dockerfile .
+            -f client/dockerfile ./client
           docker push ${{ env.CLIENT_IMAGE }}:${{ needs.set-environment.outputs.image_tag }}
 
       - name: Deploy Client to Cloud Run

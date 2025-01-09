@@ -8,7 +8,7 @@ import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
 
-axios.defaults.baseURL = process.env.SERVER_HOST;
+axios.defaults.baseURL = process.env.VITE_SERVER_HOST;
 axios.defaults.withCredentials = true;
 
 function App() {

@@ -29,7 +29,7 @@ jobs:
         run: |
           if [[ ${{ github.event_name }} == 'pull_request' ]]; then
             echo "client_service=violet-store-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
-            echo "server_service=server-server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "server_service=violet-store-server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
             echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
           else
             echo "client_service=client" >> $GITHUB_OUTPUT
@@ -147,7 +147,7 @@ jobs:
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
-            --set-env-vars="SERVER_HOST=${{ needs.deploy-server.outputs.server_url }},NODE_ENV=${{ vars.NODE_ENV }}" \
+            --set-env-vars="VITE_SERVER_HOST=${{ needs.deploy-server.outputs.server_url }},NODE_ENV=${{ vars.NODE_ENV }}" \
             --port=80
 
       - name: Get Client URL and Comment PR
@@ -157,10 +157,27 @@ jobs:
           SERVER_URL: ${{ needs.deploy-server.outputs.server_url }}
         with:
           script: |
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            for (const comment of comments.data) {
+              if (comment.body.includes('🚀 Preview deployment is ready!')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id
+                });
+                break;
+              }
+            }
+            
             const clientURL = (await exec.getExecOutput(
               'gcloud',
               ['run', 'services', 'describe', '${{ needs.set-environment.outputs.client_service }}', 
-               '--region', '${{ env.REGION }}', '--format', 'value(status.url)']
+                '--region', '${{ env.REGION }}', '--format', 'value(status.url)']
             )).stdout.trim();
 
             const commentBody = `🚀 Preview deployment is ready!

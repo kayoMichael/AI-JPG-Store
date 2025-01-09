@@ -5,8 +5,8 @@ env:
   REGION: northamerica-northeast2
   CLIENT_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/client
   SERVER_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/server
-  PROD_CLIENT_URL: https://client-url-production.run.app
-  PROD_SERVER_URL: https://server-url-production.run.app
+  PROD_CLIENT_URL: https://violet-store.run.app
+  PROD_SERVER_URL: https://violet-server.run.app
 
 on:
   push:
@@ -28,8 +28,8 @@ jobs:
         id: set-names
         run: |
           if [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            echo "client_service=client-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
-            echo "server_service=server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "client_service=violet-store-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "server_service=server-server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
             echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
           else
             echo "client_service=client" >> $GITHUB_OUTPUT

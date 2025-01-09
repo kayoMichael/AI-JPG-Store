@@ -47,5 +47,5 @@ RUN chown -R evergarden:appgroup /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
 
 USER evergarden
-EXPOSE 8080
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

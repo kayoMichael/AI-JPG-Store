@@ -92,7 +92,9 @@ jobs:
             CLIENT_HOST=${ALLOWED_ORIGINS}, \
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}, \
             SESSION_SECRET_KEY=${{ secrets.SESSION_SECRET_KEY }}, \
-            NODE_ENV=${{ vars.NODE_ENV }}"
+            NODE_ENV=${{ vars.NODE_ENV }},
+            REDIS_PORT=${{ vars.REDIS_PORT }},
+            REDIS_USERNAME=${{ vars.REDIS_USERNAME }}"
 
       - name: Get Server URL
         id: get-url

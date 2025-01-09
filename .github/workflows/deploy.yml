@@ -147,7 +147,8 @@ jobs:
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
-            --set-env-vars="SERVER_URL=${{ needs.deploy-server.outputs.server_url }},NODE_ENV=${{ vars.NODE_ENV }}"
+            --set-env-vars="SERVER_HOST=${{ needs.deploy-server.outputs.server_url }},NODE_ENV=${{ vars.NODE_ENV }}" \
+            --port=80
 
       - name: Get Client URL and Comment PR
         if: github.event_name == 'pull_request'

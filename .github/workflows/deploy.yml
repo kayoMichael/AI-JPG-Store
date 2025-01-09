@@ -135,6 +135,7 @@ jobs:
             --target production \
             --cache-from ${{ env.CLIENT_IMAGE }}:latest \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg "VITE_SERVER_HOST=${{ needs.deploy-server.outputs.server_url }}" \
             -t ${{ env.CLIENT_IMAGE }}:${{ needs.set-environment.outputs.image_tag }} \
             -f client/dockerfile ./client
           docker push ${{ env.CLIENT_IMAGE }}:${{ needs.set-environment.outputs.image_tag }}

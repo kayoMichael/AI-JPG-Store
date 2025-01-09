@@ -20,6 +20,9 @@ CMD ["npm", "run", "dev", "--", "--host"]
 # Build Stage
 # ============================
 FROM base AS builder
+ARG VITE_SERVER_HOST
+ENV VITE_SERVER_HOST=${VITE_SERVER_HOST}
+
 COPY . .
 RUN npm run build
 

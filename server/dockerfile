@@ -1,5 +1,5 @@
 # ============================
-# Base Stage: Install dependencies
+# Base Stage
 # ============================
 FROM node:22.12.0 AS base
 WORKDIR /app
@@ -15,23 +15,31 @@ EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
 # ============================
-# Build Stage: Compile TypeScript
+# Build Stage
 # ============================
 FROM base AS builder
 COPY . .
 RUN npm run build
 
 # ============================
-# Production Stage: Build and Run
+# Production Stage
 # ============================
 FROM node:22.12.0-alpine AS production
 WORKDIR /app
+
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    && npm install bcrypt --build-from-source \
+    && apk del python3 make g++
 
 RUN addgroup -g 1001 appgroup && \
     adduser -u 1001 -G appgroup -D evergarden
 
 COPY package.json ./
-RUN npm install --ignore-scripts --production
+RUN npm install --production
+
 COPY --from=builder /app/dist ./dist
 
 RUN chown -R evergarden:appgroup /app

@@ -77,7 +77,10 @@ jobs:
       - name: Deploy Server to Cloud Run
         run: |
           if [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            ALLOWED_ORIGINS="https://${{ needs.set-environment.outputs.client_service }}-${{ github.sha }}.a.run.app"
+            CLIENT_URL=$(gcloud run services describe ${{ needs.set-environment.outputs.client_service }} \
+              --region ${{ env.REGION }} \
+              --format 'value(status.url)')
+            ALLOWED_ORIGINS="${CLIENT_URL}"
           else
             ALLOWED_ORIGINS="${{ env.PROD_CLIENT_URL }}"
           fi

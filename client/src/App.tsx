@@ -8,11 +8,6 @@ import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
 
-console.log('All env variables:', import.meta.env);
-if (!import.meta.env.VITE_SERVER_HOST) {
-  console.error('Missing VITE_SERVER_HOST environment variable');
-  throw new Error('Missing VITE_SERVER_HOST environment variable');
-}
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_HOST;
 axios.defaults.withCredentials = true;
 

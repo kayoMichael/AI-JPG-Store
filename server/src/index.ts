@@ -134,7 +134,7 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-const PORT = 3000;
+const PORT = env.NODE_ENV == 'production' ? 8080 : 3000;
 const server = app.listen(PORT, () => {});
 
 process.on('uncaughtException', (error) => {

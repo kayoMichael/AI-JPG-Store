@@ -1,0 +1,179 @@
+name: Deploy MERN Stack
+
+env:
+  PROJECT_ID: mern-stack-app-447200
+  REGION: northamerica-northeast2
+  CLIENT_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/client
+  SERVER_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/server
+  PROD_CLIENT_URL: https://client-url-production.run.app
+  PROD_SERVER_URL: https://server-url-production.run.app
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  set-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      client_service: ${{ steps.set-names.outputs.client_service }}
+      server_service: ${{ steps.set-names.outputs.server_service }}
+      image_tag: ${{ steps.set-names.outputs.image_tag }}
+    steps:
+      - name: Set environment names
+        id: set-names
+        run: |
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "client_service=client-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "server_service=server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "client_service=client" >> $GITHUB_OUTPUT
+            echo "server_service=server" >> $GITHUB_OUTPUT
+            echo "image_tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+  deploy-server:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    outputs:
+      server_url: ${{ steps.get-url.outputs.url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Cloud Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and Push Server Image
+        run: |
+          docker build \
+            --target production \
+            --cache-from ${{ env.SERVER_IMAGE }}:latest \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            -t ${{ env.SERVER_IMAGE }}:${{ needs.set-environment.outputs.image_tag }} \
+            -f server/dockerfile .
+          docker push ${{ env.SERVER_IMAGE }}:${{ needs.set-environment.outputs.image_tag }}
+
+      - name: Deploy Server to Cloud Run
+        run: |
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            ALLOWED_ORIGINS="https://${{ needs.set-environment.outputs.client_service }}-${{ github.sha }}.a.run.app"
+          else
+            ALLOWED_ORIGINS="${{ env.PROD_CLIENT_URL }}"
+          fi
+
+          gcloud run deploy ${{ needs.set-environment.outputs.server_service }} \
+            --image ${{ env.SERVER_IMAGE }}:${{ needs.set-environment.outputs.image_tag }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --set-env-vars="MONGO_DB_CONNECTION_KEY=${{ secrets.MONGO_DB_CONNECTION_KEY }}, \
+            REDIS_HOST=${{ secrets.REDIS_HOST }}, \
+            CLIENT_HOST=${ALLOWED_ORIGINS}, \
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}, \
+            SESSION_SECRET_KEY=${{ secrets.SESSION_SECRET_KEY }}, \
+            NODE_ENV=${{ vars.NODE_ENV }}"
+
+      - name: Get Server URL
+        id: get-url
+        run: |
+          URL=$(gcloud run services describe ${{ needs.set-environment.outputs.server_service }} \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+  deploy-client:
+    needs: [set-environment, deploy-server]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Cloud Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and Push Client Image
+        run: |
+          docker build \
+            --target production \
+            --cache-from ${{ env.CLIENT_IMAGE }}:latest \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            -t ${{ env.CLIENT_IMAGE }}:${{ needs.set-environment.outputs.image_tag }} \
+            -f client/dockerfile .
+          docker push ${{ env.CLIENT_IMAGE }}:${{ needs.set-environment.outputs.image_tag }}
+
+      - name: Deploy Client to Cloud Run
+        id: deploy-client
+        run: |
+          gcloud run deploy ${{ needs.set-environment.outputs.client_service }} \
+            --image ${{ env.CLIENT_IMAGE }}:${{ needs.set-environment.outputs.image_tag }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --set-env-vars="SERVER_URL=${{ needs.deploy-server.outputs.server_url }},NODE_ENV=${{ vars.NODE_ENV }}"
+
+      - name: Get Client URL and Comment PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          SERVER_URL: ${{ needs.deploy-server.outputs.server_url }}
+        with:
+          script: |
+            const clientURL = (await exec.getExecOutput(
+              'gcloud',
+              ['run', 'services', 'describe', '${{ needs.set-environment.outputs.client_service }}', 
+               '--region', '${{ env.REGION }}', '--format', 'value(status.url)']
+            )).stdout.trim();
+
+            const commentBody = `🚀 Preview deployment is ready!
+            
+            Frontend URL: ${clientURL}
+            Backend URL: ${process.env.SERVER_URL}
+            
+            Preview environment details:
+            - Client Service: \`${{ needs.set-environment.outputs.client_service }}\`
+            - Server Service: \`${{ needs.set-environment.outputs.server_service }}\`
+            - Region: \`${{ env.REGION }}\`
+            - Image tag: \`${{ needs.set-environment.outputs.image_tag }}\``;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });

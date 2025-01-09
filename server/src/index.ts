@@ -50,7 +50,7 @@ app.use(
 app.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:5173',
+    origin: env.CLIENT_HOST,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })

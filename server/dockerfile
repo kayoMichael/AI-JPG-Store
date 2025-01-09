@@ -38,7 +38,7 @@ RUN addgroup -g 1001 appgroup && \
     adduser -u 1001 -G appgroup -D evergarden
 
 COPY package.json ./
-RUN npm install --production
+RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 

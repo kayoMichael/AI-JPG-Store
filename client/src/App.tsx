@@ -3,7 +3,9 @@ import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import Layout from './Layout';
+import SettingsLayout from './components/layout/SettingsLayout';
 import { useAuth } from './context/AuthContext';
+import Account from './pages/account/Account';
 import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
@@ -34,7 +36,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signout" element={<Signout />} />
-        <Route path="/account" element={<h2>Account</h2>} />
+        <Route
+          path="/account"
+          element={
+            <SettingsLayout>
+              <Account />
+            </SettingsLayout>
+          }
+        />
       </Routes>
     </>
   );

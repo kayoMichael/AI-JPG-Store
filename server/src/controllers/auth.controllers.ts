@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import UserModel from '../models/User';
-import { hashPassword, comparePassword } from '../utils/password';
+import UserModel from '../models/User.js';
+import { hashPassword, comparePassword } from '../utils/password.js';
 
 export const register = async (req: Request, res: Response) => {
   console.log('Register attempt for email:', req.body.email);

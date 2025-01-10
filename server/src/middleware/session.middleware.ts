@@ -2,8 +2,8 @@ import { RedisStore } from 'connect-redis';
 import { RequestHandler } from 'express';
 import session from 'express-session';
 
-import { env } from '../config/env';
-import redisClient from '../config/redis';
+import { env } from '../config/env.js';
+import redisClient from '../config/redis.js';
 
 const sessionMiddleware: RequestHandler = session({
   name: 'session',

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import AppearenceAccount from './AppearenceAccount';
 import ProfileAccount from './ProfileAccount';
+import SecurityAccount from './SecurityAccount';
 
 const Account = () => {
   const location = useLocation();
@@ -25,7 +26,7 @@ const Account = () => {
       case 'appearance':
         return <AppearenceAccount />;
       case 'security':
-        return <h1>Security Settings</h1>;
+        return <SecurityAccount />;
       default:
         return <div className="p-4">Loading...</div>;
     }

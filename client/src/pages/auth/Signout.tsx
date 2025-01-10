@@ -15,8 +15,7 @@ const Signout = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('/auth/logout');
-      console.log(res.data);
+      await axios.post('/auth/logout');
     } catch {
       navigate('/404');
     } finally {

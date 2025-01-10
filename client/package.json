@@ -10,7 +10,7 @@
     "lint:fix": "eslint src --fix",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md}'",
     "preview": "vite preview",
-    "prepare": "husky"
+    "start": ""
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.2",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@types/lodash": "^4.17.13",
+    "@types/node": "^22.10.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

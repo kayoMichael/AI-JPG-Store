@@ -46,7 +46,6 @@ const Login = () => {
         email: data.email,
         password: data.password,
       });
-      console.log(authentication.data);
       setAuth(authentication.data);
       navigate('/', { replace: true });
     } catch {

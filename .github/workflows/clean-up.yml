@@ -1,0 +1,51 @@
+name: "Clean Up Preview Deployments"
+
+env:
+  PROJECT_ID: mern-stack-app-447200
+  REGION: northamerica-northeast2
+  CLIENT_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/client
+  SERVER_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/server
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cleanup-pr:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Google Cloud Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Cleanup PR Resources
+        run: |
+          # Delete Cloud Run services
+          gcloud run services delete violet-store-pr-${{ github.event.number }} \
+            --region ${{ env.REGION }} --quiet || true
+          gcloud run services delete violet-store-server-pr-${{ github.event.number }} \
+            --region ${{ env.REGION }} --quiet || true
+
+          # Delete all images for this PR
+          for digest in $(gcloud artifacts docker images list ${{ env.CLIENT_IMAGE }} \
+            --format='get(digest)' \
+            --filter="tags~^pr-${{ github.event.number }}"); do
+            gcloud artifacts docker images delete "${{ env.CLIENT_IMAGE }}@$digest" --quiet
+          done
+
+          for digest in $(gcloud artifacts docker images list ${{ env.SERVER_IMAGE }} \
+            --format='get(digest)' \
+            --filter="tags~^pr-${{ github.event.number }}"); do
+            gcloud artifacts docker images delete "${{ env.SERVER_IMAGE }}@$digest" --quiet
+          done

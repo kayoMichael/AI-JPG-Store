@@ -1,4 +1,4 @@
-name: Deploy MERN Stack
+name: Deploy Application
 
 env:
   PROJECT_ID: mern-stack-app-447200

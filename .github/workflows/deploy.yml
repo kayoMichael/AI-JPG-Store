@@ -77,7 +77,7 @@ jobs:
       - name: Deploy Server to Cloud Run
         run: |
           if [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            ALLOWED_ORIGINS="\.run\.app$"
+            ALLOWED_ORIGINS="run.app"
           else
             ALLOWED_ORIGINS="${{ env.PROD_CLIENT_URL }}"
           fi

@@ -92,9 +92,12 @@ jobs:
             CLIENT_HOST=${ALLOWED_ORIGINS}, \
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}, \
             SESSION_SECRET_KEY=${{ secrets.SESSION_SECRET_KEY }}, \
-            NODE_ENV=${{ vars.NODE_ENV }},
-            REDIS_PORT=${{ vars.REDIS_PORT }},
-            REDIS_USERNAME=${{ vars.REDIS_USERNAME }}"
+            NODE_ENV=${{ vars.NODE_ENV }}, \
+            REDIS_PORT=${{ vars.REDIS_PORT }}, \
+            REDIS_USERNAME=${{ vars.REDIS_USERNAME }}, \
+            GCS_SERVICE_ACCOUNT=${{ secrets.GCS_SERVICE_ACCOUNT }}, \
+            GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}, \
+            GCS_PROJECT_ID=${{ env.PROJECT_ID }}"
 
       - name: Get Server URL
         id: get-url

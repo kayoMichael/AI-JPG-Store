@@ -1,7 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import Spinner from '@/components/common/Spinner';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -40,7 +43,7 @@ type SecurityFormValues = z.infer<typeof securityFormSchema>;
 
 const SecurityAccount = () => {
   const { toast } = useToast();
-
+  const [loading, setLoading] = useState(false);
   const form = useForm<SecurityFormValues>({
     resolver: zodResolver(securityFormSchema),
     defaultValues: {
@@ -48,16 +51,27 @@ const SecurityAccount = () => {
       newPassword: '',
       confirmPassword: '',
     },
-    mode: 'onChange',
   });
 
-  function onSubmit(data: SecurityFormValues) {
-    toast({
-      title: 'Password Updated Successfully!',
-      description: 'Your password has been changed.',
-    });
-    console.log(data);
-    form.reset();
+  async function onSubmit(data: SecurityFormValues) {
+    setLoading(true);
+    const body = { previousPassword: data.password, password: data.newPassword };
+    try {
+      await axios.put('/auth/update', body);
+      toast({
+        title: 'Password Updated Successfully!',
+        description: 'Your password has been changed.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error Updating Password',
+        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+      form.reset();
+    }
   }
 
   return (
@@ -108,7 +122,9 @@ const SecurityAccount = () => {
               </FormItem>
             )}
           />
-          <Button type="submit">Change Password</Button>
+          <Button type="submit" disabled={loading}>
+            {loading && <Spinner />} Change Password
+          </Button>
         </form>
       </Form>
     </div>

@@ -45,7 +45,10 @@ module.exports = {
     '@typescript-eslint/no-require-imports': 'warn',
     'no-undef': 'off',
     'import/no-unresolved': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^React$' }],
+    '@typescript-eslint/no-unused-vars': ['error', { 
+      argsIgnorePattern: '^(React|_)', 
+      varsIgnorePattern: '^_' 
+    }],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',

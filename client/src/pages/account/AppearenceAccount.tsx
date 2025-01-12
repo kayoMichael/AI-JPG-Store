@@ -1,3 +1,5 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
 import Spinner from '@/components/common/Spinner';
@@ -7,11 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 
-const AppearanceAccount = () => {
-  const [preview, setPreview] = useState('https://github.com/shadcn.png');
+interface Props {
+  profileImage: string;
+  userId: string;
+}
+const AppearanceAccount = ({ profileImage, userId }: Props) => {
+  const [preview, setPreview] = useState(profileImage);
   const [fileUrl, setFileUrl] = useState<string>();
+  const [file, setFile] = useState<File>();
   const [disabled, setDisabled] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,27 +29,46 @@ const AppearanceAccount = () => {
       const imageUrl = URL.createObjectURL(file);
       setPreview(imageUrl);
       setFileUrl(file.name);
+      setFile(file);
     }
   };
 
-  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    setLoading(true);
-    toast({
-      title: 'Profile Image Changed Successfully!',
-      description: `Updated Image: ${fileUrl}`,
-    });
-    setLoading(false);
-    setDisabled(true);
-  };
+  const profileImageMutation = useMutation({
+    mutationFn: async () => {
+      if (!file) {
+        throw new Error('No file selected');
+      }
+
+      const formData = new FormData();
+      formData.append('profileImage', file);
+
+      const data = await axios.patch('/user/update-profile-image', formData);
+      console.log(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', userId] });
+      toast({
+        title: 'Profile Image Changed Successfully!',
+        description: `Updated Image: ${fileUrl}`,
+        variant: 'default',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error Updating Profile Image',
+        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        variant: 'destructive',
+      });
+    },
+  });
 
   useEffect(() => {
     return () => {
-      if (preview && preview !== 'https://github.com/shadcn.png') {
+      if (preview && preview !== profileImage) {
         URL.revokeObjectURL(preview);
       }
     };
-  }, [preview]);
+  }, [profileImage, preview]);
 
   return (
     <div className="space-y-6">
@@ -91,8 +117,11 @@ const AppearanceAccount = () => {
             />
           </label>
         </div>
-        <Button disabled={disabled} onClick={handleSubmit}>
-          {loading && <Spinner />} Save Image
+        <Button
+          disabled={disabled || profileImageMutation.isPending}
+          onClick={() => profileImageMutation.mutate()}
+        >
+          {profileImageMutation.isPending && <Spinner />} Save Image
         </Button>
       </div>
     </div>

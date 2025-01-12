@@ -44,10 +44,14 @@ const Login = () => {
     }
 
     try {
-      const authentication = await axios.post('/auth/signin', {
-        email: data.email,
-        password: data.password,
+      const authentication = await axios.post('/auth/signin', data, {
+        validateStatus: (_) => true,
       });
+
+      if (authentication.status !== 200) {
+        throw new Error('Authentication failed');
+      }
+
       setAuth(authentication.data);
       navigate('/', { replace: true });
     } catch {

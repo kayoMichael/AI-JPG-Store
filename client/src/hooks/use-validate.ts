@@ -10,14 +10,12 @@ function useValidate() {
     queryKey: ['auth'],
     queryFn: async () => {
       const res = await axios.get('/auth/check');
+      if (res.data.sessionExists === false) {
+        setAuth(null);
+        return null;
+      }
       setAuth(res.data.user);
       return res.data.user;
-    },
-    retry: (failureCount, error) => {
-      if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) {
-        return false;
-      }
-      return failureCount < 3;
     },
     refetchInterval: 1000 * 60 * 15,
     refetchOnWindowFocus: true,

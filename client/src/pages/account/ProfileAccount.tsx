@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -50,6 +50,8 @@ interface Props {
 }
 
 const ProfileAccount = ({ defaultValues, userId }: Props) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -59,38 +61,43 @@ const ProfileAccount = ({ defaultValues, userId }: Props) => {
       email: defaultValues?.email || '',
     },
   });
-
   const { fields, append } = useFieldArray({
     name: 'urls',
     control: form.control,
   });
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: UpdateUser) => {
+      const response = await axios.patch('/user/update', data);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['user', userId] });
 
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+      const shortenedBio =
+        variables.bio && variables.bio.length > 30
+          ? variables.bio?.slice(0, 30) + '...'
+          : variables.bio;
 
-  async function onSubmit(data: ProfileFormValues) {
-    setLoading(true);
-    try {
-      const updateData: UpdateUser = {
-        id: userId,
-        name: data.username,
-        bio: data.bio,
-        urls: data.urls,
-      };
-      await axios.patch('/user/update', updateData);
-      const shortenedBio = data.bio.length > 30 ? data.bio.slice(0, 30) + '...' : data.bio;
       toast({
         title: 'Profile Updated Successfully!',
-        description: `username: ${data.username} bio: ${shortenedBio} url: ${data.urls?.map((url) => url.value).join(', ')}`,
+        description: `username: ${variables.name} bio: ${shortenedBio} url: ${variables.urls?.map((url) => url.value).join(', ')}`,
       });
-    } catch {
+    },
+    onError: () => {
       toast({
         title: 'Something Went Wrong...',
         description: 'Please Retry Later.',
       });
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+  async function onSubmit(data: ProfileFormValues) {
+    const updateData: UpdateUser = {
+      id: userId,
+      name: data.username,
+      bio: data.bio,
+      urls: data.urls,
+    };
+    updateProfileMutation.mutate(updateData);
   }
 
   return (
@@ -168,8 +175,8 @@ const ProfileAccount = ({ defaultValues, userId }: Props) => {
             </Button>
           </div>
           <div className="flex items-center gap-4">
-            <Button type="submit" disabled={loading}>
-              {loading && <Spinner />} Update profile
+            <Button type="submit" disabled={updateProfileMutation.isPending}>
+              {updateProfileMutation.isPending && <Spinner />} Update profile
             </Button>
           </div>
         </form>

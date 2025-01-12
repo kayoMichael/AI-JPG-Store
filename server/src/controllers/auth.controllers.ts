@@ -52,9 +52,9 @@ export const signIn = async (req: Request, res: Response) => {
 
 export const authCheck = (req: Request, res: Response) => {
   if (req.session.userId) {
-    res.json({ user: { ...req.session.user, id: req.session.userId } });
+    res.json({ user: { ...req.session.user, id: req.session.userId }, sessionExists: true });
   } else {
-    res.status(401).json({ error: 'Not authenticated' });
+    res.json({ error: 'Not authenticated', sessionExists: false });
   }
 };
 
@@ -66,4 +66,33 @@ export const signOut = (req: Request, res: Response) => {
       res.json({ message: 'Logged out successfully' });
     }
   });
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  if (!req.session.userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  const { previousPassword, password } = req.body;
+
+  try {
+    const user = await UserModel.findById(req.session.userId);
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    const isValidPassword = await comparePassword(previousPassword, user.password);
+    if (!isValidPassword) {
+      res.status(400).json({ error: 'Invalid previous password' });
+      return;
+    } else {
+      user.password = await hashPassword(password);
+      user.set({ password: user.password });
+      await user.save();
+      res.status(200).json({ message: 'Password changed successfully' });
+    }
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };

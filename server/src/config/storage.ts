@@ -1,4 +1,5 @@
 import { Storage } from '@google-cloud/storage';
+import multer from 'multer';
 
 import { env } from './env.js';
 
@@ -25,11 +26,24 @@ type UrlOptions = {
 
 const serviceAccountKey = JSON.parse(Buffer.from(env.GCS_SERVICE_ACCOUNT, 'base64').toString());
 
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only images are allowed'));
+    }
+    cb(null, true);
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
+
 async function uploadToGCS({ fileName, fileBuffer, contentType }: UploadToGCS) {
   try {
     const storage = new Storage({
       projectId: env.GCS_PROJECT_ID,
-      keyFilename: JSON.stringify(serviceAccountKey),
+      credentials: serviceAccountKey,
     });
 
     const bucketName = env.GCS_BUCKET_NAME;
@@ -65,7 +79,7 @@ async function getSignedUrl({
   try {
     const storage = new Storage({
       projectId: env.GCS_PROJECT_ID,
-      keyFilename: JSON.stringify(serviceAccountKey),
+      credentials: serviceAccountKey,
     });
 
     const bucket = storage.bucket(env.GCS_BUCKET_NAME);
@@ -74,7 +88,7 @@ async function getSignedUrl({
     const options: UrlOptions = {
       version: 'v4',
       action: 'read',
-      expires: Date.now() + expirationTimeMinutes * 60 * 1000,
+      expires: Date.now() + expirationTimeMinutes * 120 * 1000,
       contentType,
       responseDisposition: 'inline',
       responseType: contentType,
@@ -96,4 +110,4 @@ async function getSignedUrl({
   }
 }
 
-export { uploadToGCS, getSignedUrl };
+export { uploadToGCS, getSignedUrl, upload };

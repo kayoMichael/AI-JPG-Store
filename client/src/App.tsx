@@ -13,7 +13,16 @@ import SignUp from './pages/auth/Signup';
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_HOST;
 axios.defaults.withCredentials = true;
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
 
 function App() {
   return (

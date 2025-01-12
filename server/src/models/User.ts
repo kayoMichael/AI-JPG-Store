@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
-const { Schema } = mongoose;
 import { z } from 'zod';
+
+const { Schema } = mongoose;
 
 export interface IUser {
   name: string;
@@ -10,7 +11,7 @@ export interface IUser {
   createdAt?: Date;
   updatedAt?: Date;
   bio?: string;
-  urls?: string[];
+  urls?: { value: string }[];
   favourites?: string[];
 }
 
@@ -21,7 +22,7 @@ const UserSchema = new Schema<IUser>({
   profileImage: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
   bio: { type: String, required: false },
-  urls: { type: [String], required: false },
+  urls: { type: [{ value: String }], required: false },
   favourites: { type: [String], required: false },
 });
 
@@ -33,7 +34,7 @@ export const UpdateUserSchema = z.object({
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   bio: z.string().optional(),
-  urls: z.array(z.string()).optional(),
+  urls: z.array(z.object({ value: z.string() })).optional(),
   favourites: z.array(z.string()).optional(),
 });
 

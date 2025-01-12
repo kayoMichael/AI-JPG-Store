@@ -4,8 +4,10 @@ import express from 'express';
 import corsConfig from './config/cors.js';
 import { connectDB } from './config/database.js';
 import { env } from './config/env.js';
+import requireAuth from './middleware/auth.js';
 import sessionMiddleware from './middleware/session.middleware.js';
 import authRouter from './routes/auth.routes.js';
+import useRouter from './routes/user.routes.js';
 
 /**
  * Express application instance.
@@ -27,6 +29,14 @@ connectDB();
  * @see {@link ./routes/auth.routes.js}
  */
 app.use('/auth', authRouter);
+
+/**
+ * User Routes
+ * Handles User CRUD operations
+ * Base path: /users
+ * @see {@link ./routes/user.routes.js}
+ */
+app.use('/user', requireAuth, useRouter);
 
 /**
  * Start the Express server

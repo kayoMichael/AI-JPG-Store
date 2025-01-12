@@ -21,6 +21,9 @@ const envSchema = z.object({
   REDIS_USERNAME: z.string(),
   CLIENT_HOST: z.string(),
   NODE_ENV: z.string(),
+  GCS_SERVICE_ACCOUNT: z.string(),
+  GCS_PROJECT_ID: z.string(),
+  GCS_BUCKET_NAME: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

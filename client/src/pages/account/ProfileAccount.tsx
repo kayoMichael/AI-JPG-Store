@@ -1,7 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import Spinner from '@/components/common/Spinner';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -17,6 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { UpdateUser } from '@/types/user';
 import { cn } from '@/utils/merge';
 
 const profileFormSchema = z.object({
@@ -38,21 +42,22 @@ const profileFormSchema = z.object({
     .optional(),
 });
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<typeof profileFormSchema> & { email: string };
 
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: 'I am Violet Evergarden. Once, I was a soldier, trained only for battle and survival. After the war, I was lost, unable to understand the feelings of others or even my own. ',
-  urls: [
-    { value: 'http://michael-li.vercel.app' },
-    { value: 'https://en.wikipedia.org/wiki/Violet_Evergarden' },
-  ],
-};
+interface Props {
+  defaultValues: Partial<ProfileFormValues>;
+  userId: string;
+}
 
-const ProfileAccount = () => {
+const ProfileAccount = ({ defaultValues, userId }: Props) => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
-    mode: 'onChange',
+    defaultValues: {
+      username: defaultValues.username,
+      bio: defaultValues.bio ?? '',
+      urls: defaultValues.urls ?? [],
+      email: defaultValues?.email || '',
+    },
   });
 
   const { fields, append } = useFieldArray({
@@ -61,13 +66,31 @@ const ProfileAccount = () => {
   });
 
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  function onSubmit(data: ProfileFormValues) {
-    const shortenedBio = data.bio.length > 30 ? data.bio.slice(0, 30) + '...' : data.bio;
-    toast({
-      title: 'Profile Updated Successfully!',
-      description: `username: ${data.username} bio: ${shortenedBio} url: ${data.urls?.map((url) => url.value).join(', ')}`,
-    });
+  async function onSubmit(data: ProfileFormValues) {
+    setLoading(true);
+    try {
+      const updateData: UpdateUser = {
+        id: userId,
+        name: data.username,
+        bio: data.bio,
+        urls: data.urls,
+      };
+      await axios.patch('/user/update', updateData);
+      const shortenedBio = data.bio.length > 30 ? data.bio.slice(0, 30) + '...' : data.bio;
+      toast({
+        title: 'Profile Updated Successfully!',
+        description: `username: ${data.username} bio: ${shortenedBio} url: ${data.urls?.map((url) => url.value).join(', ')}`,
+      });
+    } catch {
+      toast({
+        title: 'Something Went Wrong...',
+        description: 'Please Retry Later.',
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -86,7 +109,7 @@ const ProfileAccount = () => {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="Violet Evergarden" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -94,12 +117,7 @@ const ProfileAccount = () => {
           />
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              placeholder="Email"
-              defaultValue="violet.evergarden@test.com"
-              disabled
-            />
+            <Input id="email" value={defaultValues.email} disabled />
           </div>
           <FormField
             control={form.control}
@@ -149,7 +167,11 @@ const ProfileAccount = () => {
               Add URL
             </Button>
           </div>
-          <Button type="submit">Update profile</Button>
+          <div className="flex items-center gap-4">
+            <Button type="submit" disabled={loading}>
+              {loading && <Spinner />} Update profile
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

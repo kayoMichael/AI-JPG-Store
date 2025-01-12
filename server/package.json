@@ -37,6 +37,7 @@
     "typescript-eslint": "^8.0.1"
   },
   "dependencies": {
+    "@google-cloud/storage": "^7.15.0",
     "bcrypt": "^5.1.1",
     "connect-redis": "^8.0.1",
     "cors": "^2.8.5",

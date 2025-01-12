@@ -52,7 +52,7 @@ export const signIn = async (req: Request, res: Response) => {
 
 export const authCheck = (req: Request, res: Response) => {
   if (req.session.userId) {
-    res.json({ user: req.session.user });
+    res.json({ user: { ...req.session.user, id: req.session.userId } });
   } else {
     res.status(401).json({ error: 'Not authenticated' });
   }

@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-import { IUser } from '../models/User';
+import { IUser } from '../models/User.js';
 
 export async function hashPassword(password: string) {
   const salt = await bcrypt.genSalt(10);

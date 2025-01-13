@@ -15,6 +15,7 @@ import useRouter from './routes/user.routes.js';
 const app: express.Application = express();
 
 // Initialize middleware stack
+app.set('trust proxy', 1);
 app.use(sessionMiddleware);
 app.use(cors(corsConfig));
 app.use(express.json());

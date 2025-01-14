@@ -12,10 +12,10 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 
-import { User } from '@/context/AuthContext';
+import { IUser } from '@/types/user';
 
 interface Props {
-  user: User | null;
+  user: IUser;
 }
 const Profile = ({ user }: Props) => {
   return (
@@ -23,7 +23,11 @@ const Profile = ({ user }: Props) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarImage
+              src={user.profileImage ?? 'https://github.com/shadcn.png'}
+              alt="@Profile"
+              loading="eager"
+            />
             <AvatarFallback>USER</AvatarFallback>
           </Avatar>
         </Button>

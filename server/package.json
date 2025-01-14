@@ -24,6 +24,7 @@
     "@types/express-session": "^1.18.1",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/lodash": "^4.17.13",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^8.19.0",
     "@typescript-eslint/parser": "^8.19.0",
@@ -37,6 +38,7 @@
     "typescript-eslint": "^8.0.1"
   },
   "dependencies": {
+    "@google-cloud/storage": "^7.15.0",
     "bcrypt": "^5.1.1",
     "connect-redis": "^8.0.1",
     "cors": "^2.8.5",
@@ -45,6 +47,7 @@
     "express-session": "^1.18.1",
     "ioredis": "^5.4.2",
     "mongoose": "^8.9.3",
+    "multer": "1.4.5-lts.1",
     "nodemon": "^3.1.9",
     "zod": "^3.24.1"
   }

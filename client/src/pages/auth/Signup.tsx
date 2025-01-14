@@ -6,6 +6,8 @@ import Logo from '../../components/common/Logo';
 import Spinner from '../../components/common/Spinner';
 import InputField from '../../components/layout/InputField';
 
+import { Button } from '@/components/ui/button';
+
 type FormErrors = {
   name?: string;
   email?: string;
@@ -119,19 +121,19 @@ const SignUp = () => {
           />
 
           <div>
-            <button
+            <Button
               type="submit"
               disabled={Loading}
-              className="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-70"
+              className="flex w-full justify-center rounded-md bg-primary"
             >
               {Loading ? (
                 <>
                   <Spinner className="inline w-5 h-5 mr-2 fill-primary-300" /> Processing...
                 </>
               ) : (
-                'Sign Up'
+                'Sign up'
               )}
-            </button>
+            </Button>
           </div>
         </form>
 

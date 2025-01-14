@@ -7,6 +7,8 @@ import Spinner from '../../components/common/Spinner';
 import InputField from '../../components/layout/InputField';
 import { useAuth } from '../../context/AuthContext';
 
+import { Button } from '@/components/ui/button';
+
 type FormErrors = {
   email?: string;
   password?: string;
@@ -42,10 +44,14 @@ const Login = () => {
     }
 
     try {
-      const authentication = await axios.post('/auth/signin', {
-        email: data.email,
-        password: data.password,
+      const authentication = await axios.post('/auth/signin', data, {
+        validateStatus: (_) => true,
       });
+
+      if (authentication.status !== 200) {
+        throw new Error('Authentication failed');
+      }
+
       setAuth(authentication.data);
       navigate('/', { replace: true });
     } catch {
@@ -108,7 +114,6 @@ const Login = () => {
                 autoComplete="current-password"
                 error={errors.password}
                 onChange={onInputChange}
-                label=""
               />
             </div>
           </div>
@@ -118,10 +123,10 @@ const Login = () => {
           )}
 
           <div>
-            <button
+            <Button
               type="submit"
               disabled={Loading}
-              className="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-70"
+              className="flex w-full justify-center rounded-md bg-primary"
             >
               {Loading ? (
                 <>
@@ -130,7 +135,7 @@ const Login = () => {
               ) : (
                 'Sign in'
               )}
-            </button>
+            </Button>
           </div>
         </form>
 

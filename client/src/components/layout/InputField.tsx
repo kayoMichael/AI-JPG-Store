@@ -4,7 +4,7 @@ import { cn } from '../../utils/merge';
 
 type InputProps = {
   id: string;
-  label: string;
+  label?: string;
   name: string;
   type: string;
   placeholder?: string;
@@ -30,9 +30,11 @@ const InputField: React.FC<InputProps> = ({
 }) => {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm/6 font-medium text-gray-900">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className="block text-sm/6 font-medium text-gray-900">
+          {label}
+        </label>
+      )}
       <div className="mt-1">
         <input
           id={id}

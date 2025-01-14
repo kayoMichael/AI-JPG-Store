@@ -8,12 +8,12 @@ env:
 
 on:
   pull_request:
+    types: [closed]
     branches:
       - main
 
 jobs:
   cleanup-pr:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,21 +31,31 @@ jobs:
 
       - name: Cleanup PR Resources
         run: |
-          # Delete Cloud Run services
+          echo "Cleaning up resources for PR #${{ github.event.number }}"
+          
+          echo "Deleting Cloud Run services..."
           gcloud run services delete violet-store-pr-${{ github.event.number }} \
             --region ${{ env.REGION }} --quiet || true
           gcloud run services delete violet-store-server-pr-${{ github.event.number }} \
             --region ${{ env.REGION }} --quiet || true
 
-          # Delete all images for this PR
-          for digest in $(gcloud artifacts docker images list ${{ env.CLIENT_IMAGE }} \
-            --format='get(digest)' \
-            --filter="tags~^pr-${{ github.event.number }}"); do
-            gcloud artifacts docker images delete "${{ env.CLIENT_IMAGE }}@$digest" --quiet
+          echo "Deleting container images..."
+          gcloud container images list-tags ${{ env.CLIENT_IMAGE }} \
+            --filter="tags=${{ github.sha }}" \
+            --format="get(digest)" | \
+          while read digest; do
+            if [ ! -z "$digest" ]; then
+              gcloud container images delete "${{ env.CLIENT_IMAGE }}@$digest" --quiet || true
+            fi
           done
 
-          for digest in $(gcloud artifacts docker images list ${{ env.SERVER_IMAGE }} \
-            --format='get(digest)' \
-            --filter="tags~^pr-${{ github.event.number }}"); do
-            gcloud artifacts docker images delete "${{ env.SERVER_IMAGE }}@$digest" --quiet
+          gcloud container images list-tags ${{ env.SERVER_IMAGE }} \
+            --filter="tags=${{ github.sha }}" \
+            --format="get(digest)" | \
+          while read digest; do
+            if [ ! -z "$digest" ]; then
+              gcloud container images delete "${{ env.SERVER_IMAGE }}@$digest" --quiet || true
+            fi
           done
+
+          echo "Cleanup completed"

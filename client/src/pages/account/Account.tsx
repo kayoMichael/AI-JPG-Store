@@ -58,12 +58,12 @@ const Account = () => {
 
   useEffect(() => {
     if (error) {
+      navigate('/');
       toast({
         title: 'Something Went Wrong...',
         variant: 'destructive',
         description: error instanceof Error ? error.message : 'Unknown error occurred',
       });
-      navigate('/');
     }
   }, [error, toast, navigate]);
 

@@ -47,6 +47,7 @@ const AppearanceAccount = ({ profileImage, userId }: Props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', userId] });
+      queryClient.invalidateQueries({ queryKey: ['navbarUser', userId] });
       toast({
         title: 'Profile Image Changed Successfully!',
         description: `Updated Image: ${fileUrl}`,
@@ -79,13 +80,13 @@ const AppearanceAccount = ({ profileImage, userId }: Props) => {
       <Separator />
       <div className="flex flex-col items-center gap-6">
         <Avatar className="h-1/3 w-1/3">
-          <AvatarImage src={preview} alt="@Profile" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src={preview} alt="@Profile" loading="eager" />
+          <AvatarFallback className="h-1/3 w-1/3">CN</AvatarFallback>
         </Avatar>
         <div className="w-full">
           <label
             htmlFor="dropzone-file"
-            className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
           >
             <div className="flex flex-col items-center justify-center pt-5 pb-6 h-1/2">
               <svg

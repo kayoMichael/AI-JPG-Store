@@ -9,6 +9,7 @@ import Account from './pages/account/Account';
 import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
+import Error from './pages/error/Error';
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_HOST;
 axios.defaults.withCredentials = true;
@@ -43,6 +44,7 @@ function App() {
               </SettingsLayout>
             }
           />
+          <Route path="/error" element={<Error />} />
         </Routes>
       </AuthLayout>
     </QueryClientProvider>

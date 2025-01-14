@@ -32,8 +32,8 @@ jobs:
             echo "server_service=violet-store-server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
             echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
           else
-            echo "client_service=${{ env.PROD_CLIENT_URL }}" >> $GITHUB_OUTPUT
-            echo "server_service=${{ env.PROD_SERVER_URL }}" >> $GITHUB_OUTPUT
+            echo "client_service=violet-store" >> $GITHUB_OUTPUT
+            echo "server_service=violet-server" >> $GITHUB_OUTPUT
             echo "image_tag=latest" >> $GITHUB_OUTPUT
           fi
 

@@ -7,7 +7,8 @@ import { env } from './config/env.js';
 import requireAuth from './middleware/auth.js';
 import sessionMiddleware from './middleware/session.middleware.js';
 import authRouter from './routes/auth.routes.js';
-import useRouter from './routes/user.routes.js';
+import imageRouter from './routes/image.routes.js';
+import userRouter from './routes/user.routes.js';
 
 /**
  * Express application instance.
@@ -37,7 +38,15 @@ app.use('/auth', authRouter);
  * Base path: /users
  * @see {@link ./routes/user.routes.js}
  */
-app.use('/user', requireAuth, useRouter);
+app.use('/user', requireAuth, userRouter);
+
+/**
+ * Image Routes
+ * Handles Image CRUD operations
+ * Base path: /images
+ * @see {@link ./routes/image.routes.js}
+ */
+app.use('/images', imageRouter);
 
 /**
  * Start the Express server

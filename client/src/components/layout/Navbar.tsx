@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../common/Logo';
@@ -49,9 +49,13 @@ const Navbar = () => {
           <span>JPG Store</span>
         </a>
         <nav className="flex items-center gap-4 md:gap-6 mr-16">
-          <NavButton>Recent</NavButton>
+          <Link to={'/categories'}>
+            <NavButton>Categories</NavButton>
+          </Link>
           <NavButton>Most Popular</NavButton>
-          <NavButton>Add Image</NavButton>
+          <NavButton>
+            <Link to={'/new'}>Add Image</Link>
+          </NavButton>
           <div className="relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -52,9 +52,9 @@ const Navbar = () => {
           <Link to={'/categories'}>
             <NavButton>Categories</NavButton>
           </Link>
-          <NavButton>Most Popular</NavButton>
+          <NavButton>Favourites</NavButton>
           <NavButton>
-            <Link to={'/new'}>Add Image</Link>
+            <Link to={'/new'}>My Images</Link>
           </NavButton>
           <div className="relative">
             <svg

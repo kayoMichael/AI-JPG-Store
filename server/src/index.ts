@@ -8,6 +8,7 @@ import requireAuth from './middleware/auth.js';
 import sessionMiddleware from './middleware/session.middleware.js';
 import authRouter from './routes/auth.routes.js';
 import imageRouter from './routes/image.routes.js';
+import likeRouter from './routes/like.routes.js';
 import userRouter from './routes/user.routes.js';
 
 /**
@@ -47,6 +48,14 @@ app.use('/user', requireAuth, userRouter);
  * @see {@link ./routes/image.routes.js}
  */
 app.use('/images', imageRouter);
+
+/**
+ * Like Routes
+ * Handles Image Like operations
+ * Base path: /likes
+ * @see {@link ./routes/like.routes.js}
+ */
+app.use('/likes', requireAuth, likeRouter);
 
 /**
  * Start the Express server

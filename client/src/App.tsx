@@ -9,6 +9,7 @@ import Account from './pages/account/Account';
 import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
+import CreateImage from './pages/create/CreateImage';
 import Error from './pages/error/Error';
 import Dashboard from './pages/main/Dashboard';
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
           </Route>
+          <Route path="/create" element={<CreateImage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signout" element={<Signout />} />

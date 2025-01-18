@@ -36,7 +36,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
+    "react-markdown": "^9.0.3",
     "react-router-dom": "^6.26.0",
+    "remark-gfm": "^4.0.0",
     "sonner": "^1.7.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
@@ -45,6 +47,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@tailwindcss/typography": "^0.5.16",
     "@tanstack/eslint-plugin-query": "^5.62.16",
     "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.5",

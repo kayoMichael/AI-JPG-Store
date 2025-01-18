@@ -1,249 +1,103 @@
-import { Upload } from 'lucide-react';
-import React, { useState } from 'react';
-import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
+import { ClipboardList, Eye, EyeOff, Palette, Sparkles } from 'lucide-react';
+
+import ImageForm from './ImageForm';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-
-interface FormData {
-  title: string;
-
-  category: string;
-
-  aiModel: string;
-
-  prompt: string;
-
-  image: File | null;
-}
-
-const categories = ['Photography', 'Anime', 'Impressionism', 'Baroque', 'Animal', 'Space'];
-
-const aiModels = ['Stable Diffusion', 'Midjourney', 'DALL-E', 'Sora', 'CLIP', 'VQ-VAE-2', 'Other'];
 
 const CreateImage = () => {
-  const [formData, setFormData] = useState<FormData>({
-    title: '',
-
-    category: '',
-
-    aiModel: '',
-
-    prompt: '',
-
-    image: null,
-  });
-
-  const [previewUrl, setPreviewUrl] = useState<string>('');
-
-  const [isDragging, setIsDragging] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-
-    setIsDragging(false);
-
-    const file = e.dataTransfer.files[0];
-
-    handleImageFile(file);
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (file) {
-      handleImageFile(file);
-    }
-  };
-
-  const handleImageFile = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
-
-      return;
-    }
-
-    setFormData((prev) => ({ ...prev, image: file }));
-
-    const url = URL.createObjectURL(file);
-
-    setPreviewUrl(url);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.image) {
-      toast.error('Please upload an image');
-
-      return;
-    }
-
-    if (!formData.title || !formData.category || !formData.aiModel || !formData.prompt) {
-      toast.error('Please fill in all fields');
-
-      return;
-    }
-
-    // Here you would typically send the data to your backend
-
-    console.log('Form submitted:', formData);
-
-    toast.success('Image uploaded successfully!');
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-6 space-y-8 animate-fade-in">
-      <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
-
-        <Input
-          id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleInputChange}
-          placeholder="Enter image title"
-          maxLength={100}
-        />
-
-        <p className="text-sm text-muted-foreground text-right">{formData.title.length}/100</p>
+    <div className="min-h-screen bg-white">
+      <div className="flex gap-2 items-center px-4 sm:px-6 lg:px-8 mt-8">
+        <Button className="rounded-full h-10 w-10 p-2 bg-gray-300" variant="ghost">
+          <ArrowLeft />
+        </Button>
+        <div className="font-sans font-bold">Back To Dashboard</div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-
-        <Select
-          value={formData.category}
-          onValueChange={(value) => handleSelectChange('category', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-
-          <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="aiModel">AI Model</Label>
-
-        <Select
-          value={formData.aiModel}
-          onValueChange={(value) => handleSelectChange('aiModel', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select AI model" />
-          </SelectTrigger>
-
-          <SelectContent>
-            {aiModels.map((model) => (
-              <SelectItem key={model} value={model}>
-                {model}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="prompt">AI Prompt</Label>
-
-        <Textarea
-          id="prompt"
-          name="prompt"
-          value={formData.prompt}
-          onChange={handleInputChange}
-          placeholder="Enter the prompt used to generate this image"
-          className="min-h-[100px]"
-          maxLength={500}
-        />
-
-        <p className="text-sm text-muted-foreground text-right">{formData.prompt.length}/500</p>
-      </div>
-
-      <div
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          isDragging ? 'border-primary bg-primary/5' : 'border-muted'
-        }`}
-        onDragOver={(e) => {
-          e.preventDefault();
-
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleImageDrop}
-      >
-        {previewUrl ? (
-          <div className="space-y-4">
-            <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto rounded-lg" />
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setPreviewUrl('');
-
-                setFormData((prev) => ({ ...prev, image: null }));
-              }}
-            >
-              Remove Image
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-
-            <div>
-              <Label
-                htmlFor="image-upload"
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer"
-              >
-                Choose Image
-              </Label>
-
-              <Input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            {/* Left Column - Form Section */}
+            <div className="flex-1 min-w-0">
+              <div className="space-y-6">
+                <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
+                  Post Your Own AI Generated Image Here.
+                </h1>
+                <p className="text-base sm:text-lg text-gray-600">
+                  You&apos;ll need to Create an AI Generated Image first before you can post it
+                  here.{' '}
+                  <a
+                    target="_blank"
+                    href="https://en.wikipedia.org/wiki/Generative_artificial_intelligence"
+                    rel="noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    What is Generative AI?
+                  </a>
+                </p>
+                <ImageForm />
+              </div>
             </div>
 
-            <p className="text-sm text-muted-foreground">or drag and drop your image here</p>
-          </div>
-        )}
-      </div>
+            <div className="lg:w-[450px] xl:w-[500px] hidden lg:block">
+              <div className="bg-gray-50 rounded-lg p-6 sm:p-8 space-y-8 sticky top-8">
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-semibold">
+                    After you have made your post, you&apos;ll be able to:
+                  </h2>
+                  <div className="space-y-6">
+                    <div className="flex gap-4">
+                      <ClipboardList className="w-6 h-6 text-gray-600 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-700">Manage Image settings</h3>
+                        <p className="text-gray-600">Delete/Create new Images Instantaneously</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <Sparkles className="w-6 h-6 text-gray-600 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-700">
+                          Increased User Visibility
+                        </h3>
+                        <p className="text-gray-600">Allows Other Users to View Your Profile</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <Palette className="w-6 h-6 text-gray-600 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-700">Prepare designs</h3>
+                        <p className="text-gray-600">Customize your own portfolio with images</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-      <Button type="submit" className="w-full">
-        Upload Image
-      </Button>
-    </form>
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-semibold">Your community:</h2>
+                  <div className="space-y-6">
+                    <div className="flex gap-4">
+                      <EyeOff className="w-6 h-6 text-gray-600 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-700">Can&apos;t view</h3>
+                        <p className="text-gray-600">Your Images unless you make them public.</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <Eye className="w-6 h-6 text-gray-600 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-700">Can view</h3>
+                        <p className="text-gray-600">The Images set as Public.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

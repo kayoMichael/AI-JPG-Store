@@ -92,12 +92,12 @@ const Navbar = () => {
                 Trending
               </Button>
               <div className="isolate">
-                <Link to={'/new'}>
+                <Link to={'/create'}>
                   <Button
                     variant="ghost"
                     className={`hover:text-gray-200 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
                   >
-                    New Image
+                    Create
                   </Button>
                 </Link>
               </div>

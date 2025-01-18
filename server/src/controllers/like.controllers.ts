@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import LikeModel, { RequestLikeSchema } from './../models/Likes';
+import LikeModel, { RequestLikeSchema } from './../models/Likes.js';
 export const registerLike = async (req: Request, res: Response) => {
   try {
     const { imageId } = await RequestLikeSchema.parseAsync(req.body);

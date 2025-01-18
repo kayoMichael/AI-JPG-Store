@@ -1,6 +1,6 @@
 import CategoryContent from './CategoryContent';
 
-import { Carousel, Card } from '@/components/ui/carousel';
+import { HorizontalCarousel, Card } from '@/components/ui/horizontalCarousel';
 
 const data = [
   {
@@ -56,7 +56,7 @@ const data = [
 const ImageCarousel = () => {
   const cards = data.map((card, index) => <Card key={card.src} card={card} index={index} />);
 
-  return <Carousel items={cards} />;
+  return <HorizontalCarousel items={cards} />;
 };
 
 export default ImageCarousel;

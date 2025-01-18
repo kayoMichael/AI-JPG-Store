@@ -1,5 +1,16 @@
+import { CarouselCards } from './CarouselCards';
+import ImageCard from './ImageCard';
+
+import SortingControls from '@/components/layout/FeatureButton';
+
 const Dashboard = () => {
-  return <h1>Hello World</h1>;
+  return (
+    <div className="relative">
+      <CarouselCards />
+      <SortingControls onSortChange={() => console.log('hello world')} />
+      <ImageCard />
+    </div>
+  );
 };
 
 export default Dashboard;

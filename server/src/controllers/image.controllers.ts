@@ -99,11 +99,11 @@ export const getAllImages = async (req: Request, res: Response) => {
     const limitNum = Math.max(1, Math.min(100, parseInt(String(limit))));
     const skip = (pageNum - 1) * limitNum;
 
-    const sortObject: Record<string, 'asc' | 'desc'> = {};
+    const sortObject: Record<string, 1 | -1> = {};
     if (sortBy === 'lexicographical') {
-      sortObject.name = order === 'asc' ? 'asc' : 'desc';
+      sortObject.name = order === 'asc' ? 1 : -1;
     } else {
-      sortObject.createdAt = order === 'asc' ? 'asc' : 'desc';
+      sortObject.createdAt = order === 'asc' ? 1 : -1;
     }
 
     const queryObject: Record<string, string> = {};

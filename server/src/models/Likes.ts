@@ -13,7 +13,7 @@ export const RequestLikeSchema = z.object({
   imageId: z.string(),
 });
 
-LikeSchema.index({ userId: 1, imageId: 1 }, { unique: true });
+LikeSchema.index({ userId: 1, imageId: 1 }, { unique: true, background: true });
 
 const LikeModel = mongoose.model('Like', LikeSchema);
 

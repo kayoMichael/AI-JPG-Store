@@ -99,9 +99,8 @@ const ImageForm = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-    } catch (error) {
+    } catch {
       setLoading(false);
-      console.log(error);
       navigate('/error');
     }
     setLoading(false);

@@ -62,6 +62,10 @@ export const RegisterImageSchema = z.object({
   visibility: z.nativeEnum(Visibility),
 });
 
+ImageSchema.index({ category: 1, createdAt: 1 }, { background: true });
+ImageSchema.index({ authorId: 1, createdAt: 1 }, { background: true });
+ImageSchema.index({ name: 1 }, { background: true });
+
 const ImageModel = mongoose.model('Image', ImageSchema);
 
 export default ImageModel;

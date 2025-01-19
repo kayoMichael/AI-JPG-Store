@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +7,7 @@ import { z } from 'zod';
 
 import FileUploadArea from './FileUploadArea';
 
+import Spinner from '@/components/common/Spinner';
 import MarkDown from '@/components/layout/Markdown';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -70,7 +72,7 @@ const ImageForm = () => {
     control,
     setValue,
     watch,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -84,8 +86,25 @@ const ImageForm = () => {
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('category', data.category);
+      formData.append('description', data.description);
+      formData.append('aiModel', String(data.aiModel));
+      formData.append('image', data.image[0]);
+      formData.append('visibility', 'public');
+      await axios.post('/images/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      navigate('/error');
+    }
     setLoading(false);
-    console.log(data);
     navigate('/');
   };
 
@@ -216,8 +235,8 @@ const ImageForm = () => {
 
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 -mr-60">
           <div className="max-w-screen-xl mx-auto flex justify-end">
-            <Button type="submit" disabled={isDirty || loading}>
-              Create Image
+            <Button type="submit" disabled={loading}>
+              {loading && <Spinner />}Create Image
             </Button>
           </div>
         </div>

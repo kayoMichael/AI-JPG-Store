@@ -49,14 +49,13 @@ const MulterFileSchema = z.object({
   mimetype: z.string(),
   size: z.number(),
   destination: z.string().optional(),
-  filename: z.string(),
   path: z.string().optional(),
   buffer: z.instanceof(Buffer),
 });
 
 export const RegisterImageSchema = z.object({
   title: z.string(),
-  file: MulterFileSchema,
+  image: MulterFileSchema,
   category: z.nativeEnum(Category),
   aiModel: z.string(),
   description: z.string(),

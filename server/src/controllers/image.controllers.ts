@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
+import { env } from '../config/env.js';
 import { uploadToGCS } from '../config/storage.js';
 import ImageModel, { RegisterImageSchema, Category } from '../models/Image.js';
 import UserModel from '../models/User.js';
@@ -10,15 +11,16 @@ import { getLikeCount, getLikeCounts } from './like.controllers.js';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { title, file, category, aiModel, description, visibility } =
-      await RegisterImageSchema.parseAsync(req.body);
+    const { title, category, aiModel, description, visibility, image } =
+      await RegisterImageSchema.parseAsync({ ...req.body, image: req.file });
 
     const userId = req.session.userId;
     const user = await UserModel.findById(userId);
     const result = await uploadToGCS({
-      fileName: file.filename,
-      fileBuffer: file.buffer,
-      contentType: file.mimetype,
+      fileName: title,
+      fileBuffer: image.buffer,
+      contentType: image.mimetype,
+      directory: category,
     });
 
     const validCategory = getEnumValue(Category, category);
@@ -43,7 +45,7 @@ export const register = async (req: Request, res: Response) => {
       createdAt: new Date(),
       updatedAt: new Date(),
       visibility,
-      url: `https://storage.googleapis.com/${process.env.GCS_BUCKET}/${file.filename}`,
+      url: `https://storage.googleapis.com/${env.GCS_BUCKET_NAME}/${category}/${title}`,
     });
     res.status(201).json({ message: 'Image Created Successfully successfully' });
   } catch {

@@ -1,5 +1,5 @@
 import { ImageIcon, CheckCircle2 } from 'lucide-react';
-import React from 'react';
+import { useEffect } from 'react';
 import { UseFormRegister, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 
 import { FormValues } from './ImageForm';
@@ -27,7 +27,7 @@ const FileUploadArea = ({ register, watch, setValue }: Props) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (file?.[0]) {
       handlePreview(file[0]);
     } else {

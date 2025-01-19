@@ -21,7 +21,6 @@ const CreateImage = () => {
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-            {/* Left Column - Form Section */}
             <div className="flex-1 min-w-0">
               <div className="space-y-6">
                 <h1 className="text-3xl sm:text-4xl font-bold leading-tight">

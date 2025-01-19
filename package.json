@@ -29,7 +29,8 @@
   "lint-staged": {
     "client/**/*.{js,jsx,ts,tsx}": [
       "eslint --config ./client/.eslintrc.cjs --fix",
-      "prettier --write"
+      "prettier --write",
+      "pnpm --filter client lint"
     ],
     "server/**/*.{js,ts}": [
       "eslint --config ./server/.eslintrc.cjs --fix",

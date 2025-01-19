@@ -1,10 +1,17 @@
 import { Router } from 'express';
 
-import { registerLike, deleteLike } from '../controllers/like.controllers.js';
+import {
+  registerLike,
+  deleteLike,
+  getLike,
+  getUserLikes,
+} from '../controllers/like.controllers.js';
 
 const router: Router = Router();
 
-router.post('/like', registerLike);
-router.delete('/unlike', deleteLike);
+router.post('/register', registerLike);
+router.delete('/delete', deleteLike);
+router.get('/get', getLike);
+router.get('/getUserLike', getUserLikes);
 
 export default router;

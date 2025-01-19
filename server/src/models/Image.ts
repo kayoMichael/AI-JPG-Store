@@ -13,6 +13,11 @@ export enum Category {
   Renaissance = 'Renaissance',
 }
 
+export enum Visibility {
+  Public = 'public',
+  Private = 'private',
+}
+
 export interface IImage {
   title: string;
   url: string;
@@ -20,9 +25,9 @@ export interface IImage {
   updatedAt?: Date;
   category: Category;
   aiModel: string;
-  prompt: string;
   description: string;
   authorId: string;
+  visibility: 'public' | 'private';
 }
 
 const ImageSchema = new Schema<IImage>({
@@ -32,9 +37,9 @@ const ImageSchema = new Schema<IImage>({
   updatedAt: { type: Date, default: Date.now },
   category: { type: String, enum: Object.values(Category), required: true },
   aiModel: { type: String, required: true },
-  prompt: { type: String, required: true },
   description: { type: String, required: true },
   authorId: { type: String, required: true },
+  visibility: { type: String, enum: ['public', 'private'], required: true },
 });
 
 const MulterFileSchema = z.object({
@@ -54,8 +59,8 @@ export const RegisterImageSchema = z.object({
   file: MulterFileSchema,
   category: z.nativeEnum(Category),
   aiModel: z.string(),
-  prompt: z.string(),
   description: z.string(),
+  visibility: z.nativeEnum(Visibility),
 });
 
 const ImageModel = mongoose.model('Image', ImageSchema);

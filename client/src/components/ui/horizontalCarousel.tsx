@@ -103,7 +103,7 @@ export const HorizontalCarousel = ({ items, initialScroll = 0 }: CarouselProps) 
             ))}
           </div>
         </div>
-        <div className="absolute bottom-0 right-0 flex justify-end gap-2 mr-4">
+        <div className="absolute -bottom-5 right-0 flex justify-end gap-2 mr-4">
           <button
             className="relative z-40 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
             onClick={scrollLeft}

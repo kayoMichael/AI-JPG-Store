@@ -45,7 +45,7 @@ export const register = async (req: Request, res: Response) => {
       createdAt: new Date(),
       updatedAt: new Date(),
       visibility,
-      url: `https://storage.googleapis.com/${env.GCS_BUCKET_NAME}/${category}/${title}`,
+      url: `https://storage.googleapis.com/${env.GCS_BUCKET_NAME}/Category/${category}/${title}`,
     });
     res.status(201).json({ message: 'Image Created Successfully successfully' });
   } catch {
@@ -115,12 +115,21 @@ export const getAllImages = async (req: Request, res: Response) => {
     }
 
     const [images, totalCount] = await Promise.all([
-      ImageModel.find(queryObject).sort(sortObject).skip(skip).limit(limitNum).exec(),
+      ImageModel.find(queryObject)
+        .populate({
+          path: 'authorId',
+          select: 'name email profileImage',
+        })
+        .sort(sortObject)
+        .skip(skip)
+        .limit(limitNum)
+        .exec(),
       ImageModel.countDocuments(queryObject),
     ]);
 
     const imageIds = images.map((img) => String(img._id));
     const likeCounts = await getLikeCounts(imageIds);
+
     const imagesWithLikes = images.map((img) => ({
       ...img.toObject(),
       likes: likeCounts[String(img._id)] || 0,
@@ -160,7 +169,7 @@ export const deleteImage = async (req: Request, res: Response) => {
     if (!image) {
       res.status(404).json({ error: 'Image not found' });
       return;
-    } else if (image.authorId !== req.session.userId) {
+    } else if (String(image.authorId) !== req.session.userId) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }

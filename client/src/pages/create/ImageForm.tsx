@@ -52,9 +52,9 @@ const formSchema = z.object({
 export type FormValues = z.infer<typeof formSchema>;
 
 const categories = [
-  'Animal',
   'Anime',
   'Baroque',
+  'Cyberpunk',
   'Contemporary',
   'Impressionism',
   'Photography',

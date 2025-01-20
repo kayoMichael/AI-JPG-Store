@@ -8,9 +8,10 @@ export enum Category {
   Baroque = 'Baroque',
   Anime = 'Anime',
   Photograph = 'Photograph',
-  Animal = 'Animal',
+  Animal = 'Cyberpunk',
   Space = 'Space',
   Renaissance = 'Renaissance',
+  Contemporary = 'Contemporary',
 }
 
 export enum Visibility {
@@ -26,7 +27,7 @@ export interface IImage {
   category: Category;
   aiModel: string;
   description: string;
-  authorId: string;
+  authorId: mongoose.Schema.Types.ObjectId;
   visibility: 'public' | 'private';
 }
 
@@ -38,7 +39,7 @@ const ImageSchema = new Schema<IImage>({
   category: { type: String, enum: Object.values(Category), required: true },
   aiModel: { type: String, required: true },
   description: { type: String, required: true },
-  authorId: { type: String, required: true },
+  authorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   visibility: { type: String, enum: ['public', 'private'], required: true },
 });
 

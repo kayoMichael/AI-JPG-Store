@@ -8,15 +8,21 @@ import Logo from '../common/Logo';
 import Container from '../container/Container';
 import NavbarSkeleton from '../skeleton/NavbarSkeleton';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
 import { Separator } from '../ui/separator';
 
 import Profile from './Profile';
+
+import useCategory from '@/context/CategoryContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const user = useAuth((state) => state.user);
   const navigate = useNavigate();
+  const { categoryRef } = useCategory();
+
+  const scrollToCategory = () => {
+    categoryRef?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,68 +75,37 @@ const Navbar = () => {
             <a href="/" className="flex items-center gap-2">
               <Logo className="h-9 w-9" />
               <span
-                className={`text-sm md:text-lg lg:text-2xl ${isScrolled ? 'text-black' : 'text-white'}`}
+                className={`hidden md:text-lg md:block lg:text-2xl ${isScrolled ? 'text-black' : 'text-white'}`}
               >
-                JPG Store
+                AI Image Store
               </span>
               <Separator
                 orientation="vertical"
-                className={`h-6 ${isScrolled ? 'bg-gray-200' : 'bg-gray-400'}`}
+                className={`h-6 ml-3 hidden md:block ${isScrolled ? 'bg-gray-200' : 'bg-gray-400'}`}
               />
             </a>
 
-            <div className="flex items-center gap-4 md:gap-6 mr-16">
-              <Link to={'/categories'}>
+            <div className="flex items-center gap-4 md:gap-6 mr-14">
+              <Link to={'/images/trending'}>
                 <Button
                   variant="ghost"
-                  className={`hover:text-gray-200 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
+                  className={` ${isScrolled ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
                 >
-                  Favourites
+                  Trending
                 </Button>
               </Link>
-              <Button variant="ghost" className={` ${isScrolled ? 'text-gray-700' : 'text-white'}`}>
-                Trending
-              </Button>
               <div className="isolate">
-                <Link to={'/create'}>
-                  <Button
-                    variant="ghost"
-                    className={`hover:text-gray-200 ${isScrolled ? 'text-gray-700' : 'text-white'}`}
-                  >
-                    Create
-                  </Button>
-                </Link>
+                <Button
+                  variant="ghost"
+                  onClick={scrollToCategory}
+                  className={`${isScrolled ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
+                >
+                  Categories
+                </Button>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className={`md:block absolute left-2 top-1/2 transform -translate-y-1/2 size-5 hidden ${
-                  isScrolled ? 'text-gray-400' : 'text-muted-foreground'
-                }`}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-              <Input
-                type="search"
-                placeholder="Search..."
-                className={`pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary border-2 w-full hidden lg:inline-flex ${
-                  isScrolled
-                    ? 'bg-gray-50 text-gray-700 border-gray-200'
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              />
-            </div>
             <Profile user={userData} />
           </div>
         </div>

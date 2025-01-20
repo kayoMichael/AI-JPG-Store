@@ -11,7 +11,7 @@ export const Card = React.memo(
     hovered,
     setHovered,
   }: {
-    card: any;
+    card: Card;
     index: number;
     hovered: number | null;
     setHovered: React.Dispatch<React.SetStateAction<number | null>>;
@@ -26,7 +26,7 @@ export const Card = React.memo(
     >
       <div className="w-full h-full relative">
         <Image
-          src={card.src}
+          src={card.url}
           alt={card.title}
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -37,8 +37,13 @@ export const Card = React.memo(
           hovered === index ? 'opacity-100' : 'opacity-0'
         )}
       >
-        <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
-          {card.title}
+        <div className="flex flex-col gap-2">
+          <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+            {card.title}
+          </div>
+          <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+            {card.category}
+          </p>
         </div>
       </div>
     </div>
@@ -49,7 +54,8 @@ Card.displayName = 'Card';
 
 type Card = {
   title: string;
-  src: string;
+  url: string;
+  category: string;
 };
 
 export function FocusCards({ cards }: { cards: Card[] }) {

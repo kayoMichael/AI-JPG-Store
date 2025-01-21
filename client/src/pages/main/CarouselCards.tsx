@@ -29,7 +29,7 @@ export const CarouselCards = ({ featuredData }: Props) => {
       const width = window.innerWidth;
       if (width < 640) {
         setItemsToShow(1);
-      } else if (width < 768) {
+      } else if (width < 1000) {
         setItemsToShow(2);
       } else if (width < 1424) {
         setItemsToShow(3);

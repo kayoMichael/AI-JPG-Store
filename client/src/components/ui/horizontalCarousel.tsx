@@ -1,6 +1,7 @@
 import { IconArrowNarrowLeft, IconArrowNarrowRight, IconX } from '@tabler/icons-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Image, { ImageProps } from '../common/Image';
 
@@ -136,6 +137,7 @@ export const Card = ({
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { onCardClose } = useContext(CarouselContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -155,10 +157,6 @@ export const Card = ({
   }, [open]);
 
   useOutsideClick(containerRef, () => handleClose());
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
 
   const handleClose = () => {
     setOpen(false);
@@ -209,7 +207,7 @@ export const Card = ({
       </AnimatePresence>
       <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
-        onClick={handleOpen}
+        onClick={() => navigate(`/images/${card.category.toLowerCase()}`)}
         className="group rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-56 md:h-[40rem] md:w-96 relative z-10 overflow-hidden"
       >
         <div className="absolute inset-0">

@@ -11,6 +11,7 @@ import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
 import CreateImage from './pages/create/CreateImage';
 import Error from './pages/error/Error';
+import Images from './pages/image/Images';
 import Dashboard from './pages/main/Dashboard';
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_HOST;
@@ -34,6 +35,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
+            <Route path="/images/:category" element={<Images />} />
           </Route>
           <Route path="/create" element={<CreateImage />} />
           <Route path="/login" element={<Login />} />

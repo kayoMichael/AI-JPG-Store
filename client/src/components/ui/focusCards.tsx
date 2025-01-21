@@ -10,11 +10,13 @@ export const Card = React.memo(
     index,
     hovered,
     setHovered,
+    type,
   }: {
     card: Card;
     index: number;
     hovered: number | null;
     setHovered: React.Dispatch<React.SetStateAction<number | null>>;
+    type: 'main' | 'category';
   }) => (
     <div
       onMouseEnter={() => setHovered(index)}
@@ -37,14 +39,25 @@ export const Card = React.memo(
           hovered === index ? 'opacity-100' : 'opacity-0'
         )}
       >
-        <div className="flex flex-col gap-2">
-          <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
-            {card.title}
+        {type === 'main' ? (
+          <div className="flex flex-col gap-2">
+            <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+              {card.title}
+            </div>
+            <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+              {card.category}
+            </p>
           </div>
-          <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
-            {card.category}
-          </p>
-        </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+              {card.title}
+            </div>
+            <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+              {card.authorId.name}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -56,9 +69,11 @@ type Card = {
   title: string;
   url: string;
   category: string;
+  authorId: { name: string };
+  likes: number;
 };
 
-export function FocusCards({ cards }: { cards: Card[] }) {
+export function FocusCards({ cards, type }: { cards: Card[]; type: 'main' | 'category' }) {
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
@@ -67,6 +82,7 @@ export function FocusCards({ cards }: { cards: Card[] }) {
       {cards.map((card, index) => (
         <Card
           key={card.title}
+          type={type}
           card={card}
           index={index}
           hovered={hovered}

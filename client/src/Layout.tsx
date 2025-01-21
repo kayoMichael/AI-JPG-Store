@@ -1,16 +1,32 @@
 import { Outlet } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import Container from './components/container/Container';
+import DynamicCover from './components/layout/DynamicCover';
 import Navbar from './components/layout/Navbar';
 
 export default function Layout() {
+  const { category } = useParams();
   return (
     <>
-      <div className="absolute top-0 left-0 w-full h-[600px] -z-10 bg-[linear-gradient(180deg,#1e3a4a_0%,#1f3942_25%,rgba(40,60,80,0.7)_50%,rgba(255,255,255,0.2)_90%,#ffffff_100%)]" />
-      <Navbar />
-      <Container>
-        <Outlet />
-      </Container>
+      {category ? (
+        <div className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[500px] h-3/4">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent h-3/4 min-h-[500px]" />
+          <Navbar />
+          <DynamicCover />
+          <Container>
+            <Outlet />
+          </Container>
+        </div>
+      ) : (
+        <>
+          <Navbar />
+          <DynamicCover />
+          <Container>
+            <Outlet />
+          </Container>
+        </>
+      )}
     </>
   );
 }

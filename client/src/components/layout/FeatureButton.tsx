@@ -37,7 +37,7 @@ const SortingControls = ({ onSortChange }: { onSortChange: (option: SortOption) 
   ];
 
   return (
-    <div className="flex flex-wrap gap-3 mb-8 mt-14">
+    <div className="flex flex-wrap gap-3 mb-8">
       {buttons.map(({ id, icon: Icon, label }) => (
         <button
           key={id}

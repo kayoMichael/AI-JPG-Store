@@ -26,6 +26,7 @@ export const DirectionAwareHover = ({
     if (!ref.current) return;
 
     const direction = getDirection(event, ref.current);
+    console.log('direction', direction);
     switch (direction) {
       case 0:
         setDirection('top');
@@ -63,7 +64,12 @@ export const DirectionAwareHover = ({
       )}
     >
       <AnimatePresence mode="wait">
-        <motion.div className="relative h-full w-full" initial={false} animate={direction}>
+        <motion.div
+          className="relative h-full w-full"
+          initial="initial"
+          whileHover={direction}
+          exit="exit"
+        >
           <motion.div className="group-hover/card:block hidden absolute inset-0 w-full h-full bg-black/40 z-10 transition duration-500" />
           <motion.div
             variants={variants}
@@ -78,12 +84,11 @@ export const DirectionAwareHover = ({
               className={cn('h-full w-full object-cover scale-[1.15]', imageClassName)}
               width={1000}
               height={1000}
-              loading="eager"
               src={imageUrl}
             />
           </motion.div>
           <motion.div
-            variants={textVariants}
+            variants={textVariants} // Use textVariants to control visibility
             transition={{
               duration: 0.5,
               ease: 'easeOut',
@@ -125,27 +130,27 @@ const textVariants = {
   initial: {
     y: 0,
     x: 0,
-    opacity: 0,
+    opacity: 0, // Hidden by default
   },
   exit: {
     y: 0,
     x: 0,
-    opacity: 0,
+    opacity: 0, // Hidden on exit
   },
   top: {
     y: -20,
-    opacity: 1,
+    opacity: 1, // Visible on hover
   },
   bottom: {
     y: 2,
-    opacity: 1,
+    opacity: 1, // Visible on hover
   },
   left: {
     x: -2,
-    opacity: 1,
+    opacity: 1, // Visible on hover
   },
   right: {
     x: 20,
-    opacity: 1,
+    opacity: 1, // Visible on hover
   },
 };

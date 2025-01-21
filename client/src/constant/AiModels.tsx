@@ -36,4 +36,5 @@ export const AiModels = [
     badge: 'Runway AI',
     image: <Runway />,
   },
+  { id: 80, name: 'Other Model', description: 'Another AI model', badge: 'Other', image: null },
 ];

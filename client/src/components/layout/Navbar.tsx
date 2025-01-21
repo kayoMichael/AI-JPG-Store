@@ -21,6 +21,10 @@ const Navbar = () => {
   const { categoryRef } = useCategory();
 
   const scrollToCategory = () => {
+    if (!categoryRef) {
+      navigate('/?scrollToCategory=true');
+      return;
+    }
     categoryRef?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -86,12 +90,12 @@ const Navbar = () => {
             </a>
 
             <div className="flex items-center gap-4 md:gap-6 mr-14">
-              <Link to={'/images/trending'}>
+              <Link to={'/images/all'}>
                 <Button
                   variant="ghost"
                   className={` ${isScrolled ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
                 >
-                  Trending
+                  All Images
                 </Button>
               </Link>
               <div className="isolate">

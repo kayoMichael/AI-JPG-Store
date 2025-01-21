@@ -9,7 +9,7 @@ const staticCover = {
       alt="Anime"
       priority={true}
       loading="eager"
-      className="absolute top-0 left-0 w-full h-[700px] -z-10"
+      className="absolute top-0 left-0 w-full h-3/4 -z-10  min-h-[500px]"
     />
   ),
 
@@ -19,7 +19,7 @@ const staticCover = {
       alt="Baroque"
       priority={true}
       loading="eager"
-      className="absolute top-0 left-0 w-full h-[650px] -z-10"
+      className="absolute top-0 left-0 w-full h-3/4 -z-10  min-h-[500px]"
     />
   ),
   root: (
@@ -30,7 +30,7 @@ const staticCover = {
       src="/cover/photography.webp"
       priority={true}
       loading="eager"
-      className="absolute top-0 left-0 w-full h-[650px] -z-10"
+      className="absolute top-0 left-0 w-full h-3/4 -z-10  min-h-[500px]"
     />
   ),
   cyberpunk: (
@@ -38,7 +38,7 @@ const staticCover = {
       src="/cover/cyberpunk.png"
       priority={true}
       loading="eager"
-      className="absolute top-0 left-0 w-full h-[650px] -z-10"
+      className="absolute top-0 left-0 w-full h-3/4 -z-10  min-h-[500px]"
     />
   ),
   contemporary: (
@@ -46,7 +46,7 @@ const staticCover = {
       src="/cover/contemporary.webp"
       priority={true}
       loading="eager"
-      className="absolute top-0 left-0 w-full h-[650px] -z-10"
+      className="absolute top-0 left-0 w-full h-3/4 -z-10  min-h-[500px]"
     />
   ),
   renaissance: (
@@ -54,7 +54,7 @@ const staticCover = {
       src="/cover/renaissance.jpg"
       priority={true}
       loading="eager"
-      className="absolute top-0 left-0 w-full h-[650px] -z-10"
+      className="absolute top-0 left-0 w-full h-3/4 -z-10  min-h-[500px]"
     />
   ),
   impressionism: (
@@ -70,15 +70,19 @@ const staticCover = {
       src="/cover/space.png"
       priority={true}
       loading="eager"
-      className="absolute top-0 left-0 w-full h-[650px] -z-10"
+      className="absolute top-0 left-0 w-full h-3/4 -z-10  min-h-[500px]"
     />
+  ),
+  all: (
+    <div className="absolute top-0 left-0 w-full h-[600px] -z-10 bg-[linear-gradient(180deg,#1e3a4a_0%,#1f3942_25%,rgba(40,60,80,0.7)_50%,rgba(255,255,255,0.2)_90%,#ffffff_100%)]" />
   ),
 };
 
 const DynamicCover = () => {
   const isRoot = useMatch('/');
+  const isAllImages = useMatch('/images/all');
   const { category } = useParams<{ category: 'anime' | 'baroque' }>();
-  return isRoot ? staticCover.root : category ? staticCover[category] : null;
+  return isRoot || isAllImages ? staticCover.root : category ? staticCover[category] : null;
 };
 
 export default DynamicCover;

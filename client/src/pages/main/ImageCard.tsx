@@ -7,6 +7,7 @@ interface Props {
     category: string;
     authorId: { name: string };
     likes: number;
+    aiModel: string;
   }[];
 }
 const ImageCard = ({ images }: Props) => {

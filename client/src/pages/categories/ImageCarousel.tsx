@@ -16,7 +16,7 @@ const data = [
   {
     category: 'Photography',
     title: 'Realistic visuals',
-    src: 'https://images.unsplash.com/photo-1713869791518-a770879e60dc?q=80&w=2333&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    src: '/category/photography.jpg',
     content: <div></div>,
   },
   {
@@ -40,13 +40,13 @@ const data = [
   {
     category: 'Space',
     title: 'Down To Earth',
-    src: 'https://images.unsplash.com/photo-1511984804822-e16ba72f5848?q=80&w=2048&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    src: '/category/space.jpg',
     content: <div></div>,
   },
   {
     category: 'Cyberpunk',
     title: 'Including Fictional ones',
-    src: 'https://images.unsplash.com/photo-1511984804822-e16ba72f5848?q=80&w=2048&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    src: '/category/cyberpunk.jpg',
     content: <div></div>,
   },
 ];

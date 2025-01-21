@@ -1,24 +1,21 @@
-import { SortAsc, Clock, Star, CalendarDays } from 'lucide-react';
-import { useState } from 'react';
+import { SortAsc, Clock, CalendarDays } from 'lucide-react';
 
 import { cn } from '@/utils/merge';
 
-type SortOption = 'featured' | 'newest' | 'oldest' | 'alphabetical';
+type SortOption = 'newest' | 'oldest' | 'alphabetical';
 
-const SortingControls = ({ onSortChange }: { onSortChange: (option: SortOption) => void }) => {
-  const [activeSort, setActiveSort] = useState<SortOption>('featured');
-
+const SortingControls = ({
+  onSortChange,
+  activeSort,
+}: {
+  onSortChange: (option: SortOption) => void;
+  activeSort: SortOption;
+}) => {
   const handleSort = (option: SortOption) => {
-    setActiveSort(option);
     onSortChange(option);
   };
 
   const buttons = [
-    {
-      id: 'featured',
-      icon: Star,
-      label: 'Featured',
-    },
     {
       id: 'newest',
       icon: Clock,

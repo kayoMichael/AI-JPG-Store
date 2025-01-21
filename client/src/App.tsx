@@ -6,6 +6,7 @@ import Layout from './Layout';
 import AuthLayout from './components/layout/AuthLayout';
 import SettingsLayout from './components/layout/SettingsLayout';
 import Account from './pages/account/Account';
+import AllImages from './pages/all-images/AllImages';
 import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
@@ -36,6 +37,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="/images/:category" element={<Images />} />
+            <Route path="/images/all" element={<AllImages />} />
           </Route>
           <Route path="/create" element={<CreateImage />} />
           <Route path="/login" element={<Login />} />

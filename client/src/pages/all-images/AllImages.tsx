@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import SortingControls from '@/components/layout/FeatureButton';
 import { FocusCards } from '@/components/ui/focusCards';
@@ -14,12 +14,9 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from '@/components/ui/pagination';
-import { capitalize } from '@/utils/capitalise';
 
-const Images = () => {
-  const { category } = useParams<{ category: string }>();
-  const [uniqueAuthors, setUniqueAuthors] = useState<number>(0);
-  const [totalLikes, setTotalLikes] = useState<number>(0);
+const Trending = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
   const [sorting, setSorting] = useState<{ sortBy: string; order: string }>({
@@ -34,40 +31,22 @@ const Images = () => {
     hasNextPage: boolean;
     hasPrevPage: boolean;
   }>();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!category) {
-      navigate('/');
-    }
-  }, [category, navigate]);
-
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['categoryImages', currentPage, sorting],
+    queryKey: ['trendingImages', currentPage, sorting],
     queryFn: async () => {
       const response = await axios
         .get(
-          `/images/get?limit=24&page=${currentPage}&category=${capitalize(category!)}&sortBy=${sorting.sortBy}&order=${sorting.order}`
+          `/images/get?limit=24&page=${currentPage}&sortBy=${sorting.sortBy}&order=${sorting.order}`
         )
         .then((res) => res.data);
       setPagination(response.pagination);
       const images = response.images;
-      const numberOfAuthors = new Set(
-        images.map((image: { authorId: { _id: string } }) => image.authorId._id)
-      ).size;
-      const totalLikes = images.reduce(
-        (acc: number, image: { likes: number }) => acc + image.likes,
-        0
-      );
-      setUniqueAuthors(numberOfAuthors);
-      setTotalLikes(totalLikes);
       return images;
     },
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,
   });
-
   useEffect(() => {
     if (isError) {
       navigate('/error');
@@ -76,14 +55,6 @@ const Images = () => {
 
   if (isLoading) {
     return null;
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-[500px]">
-        <p className="text-white">No images found for this category.</p>
-      </div>
-    );
   }
 
   const handlePageChange = (page: number) => {
@@ -164,59 +135,14 @@ const Images = () => {
       setSorting({ sortBy: 'lexicographical', order: 'desc' });
     }
   };
-
   return (
     <>
-      <div className="relative w-full min-h-[500px]">
-        <div className="absolute bottom-1/4 left-4 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-white text-3xl md:text-6xl font-bold">
-                {capitalize(category ?? '')}
-              </h1>
-            </div>
-
-            <div className="text-white">
-              <p className="text-lg md:mt-20">
-                Collection Focused on {capitalize(category ?? '')} Art Style created by Generative
-                AI
-              </p>
-              <div className="flex gap-4 text-sm mt-2">
-                <span>Last Created: {data[0].createdAt.split('T')[0]}</span>
-                <span>Collection Created: {data.at(-1).createdAt.split('T')[0]}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-6 text-white text-sm">
-              <div>
-                <p>Total Images</p>
-                <p className="font-bold">{pagination?.totalItems}</p>
-              </div>
-              <div>
-                <p>Total Likes</p>
-                <p className="font-bold">{totalLikes}</p>
-              </div>
-              <div>
-                <p>Last Posted</p>
-                <p className="font-bold">{data[0].title}</p>
-              </div>
-              <div>
-                <p>Visible</p>
-                <p className="font-bold">100%</p>
-              </div>
-              <div>
-                <p>Authors (Unique)</p>
-                <p className="font-bold">{uniqueAuthors}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="text-5xl mb-14 text-white">All Images</div>
       <SortingControls
         activeSort={activeSort}
         onSortChange={(option: 'newest' | 'oldest' | 'alphabetical') => handleSortChange(option)}
       />
-      <FocusCards cards={data} type="category" />
+      <FocusCards cards={data} type="main" />
       <div className="mt-10">
         <Pagination>
           <PaginationContent>{renderPaginationItems()}</PaginationContent>
@@ -226,4 +152,4 @@ const Images = () => {
   );
 };
 
-export default Images;
+export default Trending;

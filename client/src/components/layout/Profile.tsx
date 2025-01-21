@@ -43,6 +43,9 @@ const Profile = ({ user }: Props) => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              <Link to={'/create'}>
+                <DropdownMenuItem>Create Image</DropdownMenuItem>
+              </Link>
               <Link to={'/account'}>
                 <DropdownMenuItem>Account</DropdownMenuItem>
               </Link>

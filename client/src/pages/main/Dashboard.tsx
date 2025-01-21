@@ -1,13 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 
 import Categories from '../categories/Categories';
 
 import { CarouselCards } from './CarouselCards';
 import ImageCard from './ImageCard';
 
+import useCategory from '@/context/CategoryContext';
+
 const Dashboard = () => {
+  const { categoryRef, setCategoryRef } = useCategory();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const shouldScrollToCategory = searchParams.get('scrollToCategory');
+
+    if (shouldScrollToCategory === 'true' && categoryRef) {
+      categoryRef.scrollIntoView({ behavior: 'smooth' });
+      window.history.replaceState({}, '', '/');
+      setCategoryRef(null);
+    }
+  }, [categoryRef, setCategoryRef]);
+
   const { data, isLoading } = useQuery({
     queryKey: ['mainImages'],
     queryFn: async () => {

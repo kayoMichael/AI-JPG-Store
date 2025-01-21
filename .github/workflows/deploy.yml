@@ -5,8 +5,8 @@ env:
   REGION: northamerica-northeast2
   CLIENT_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/client
   SERVER_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/server
-  PROD_CLIENT_URL: https://violet-store.run.app
-  PROD_SERVER_URL: https://violet-server.run.app
+  PROD_CLIENT_URL: https://violet-store-979936343537.northamerica-northeast2.run.app
+  PROD_SERVER_URL: https://violet-server-979936343537.northamerica-northeast2.run.app
 
 on:
   push:

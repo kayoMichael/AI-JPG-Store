@@ -6,10 +6,14 @@ import Layout from './Layout';
 import AuthLayout from './components/layout/AuthLayout';
 import SettingsLayout from './components/layout/SettingsLayout';
 import Account from './pages/account/Account';
+import AllImages from './pages/all-images/AllImages';
 import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
+import CreateImage from './pages/create/CreateImage';
 import Error from './pages/error/Error';
+import Images from './pages/image/Images';
+import Dashboard from './pages/main/Dashboard';
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_HOST;
 axios.defaults.withCredentials = true;
@@ -31,8 +35,11 @@ function App() {
       <AuthLayout>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<h2></h2>} />
+            <Route index element={<Dashboard />} />
+            <Route path="/images/:category" element={<Images />} />
+            <Route path="/images/all" element={<AllImages />} />
           </Route>
+          <Route path="/create" element={<CreateImage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signout" element={<Signout />} />

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { env } from '../config/env.js';
-import { uploadToGCS, getSignedUrl } from '../config/storage.js';
+import { uploadToGCS } from '../config/storage.js';
 import UserModel, { UpdateUserSchema } from '../models/User.js';
 import { excludePassword } from '../utils/password.js';
 
@@ -80,16 +80,9 @@ export const updateUserProfileImage = async (req: Request, res: Response) => {
     });
     await user.save();
 
-    const signedUrlResult = await getSignedUrl({
-      fileName,
-      expirationTimeMinutes: 120,
-      contentType: req.file.mimetype,
-    });
-
     res.json({
       success: true,
       filePath: result.filePath,
-      signedUrl: signedUrlResult.success ? signedUrlResult.url : null,
     });
   } catch (error) {
     console.error('Upload error:', error);

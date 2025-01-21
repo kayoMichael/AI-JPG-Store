@@ -1,20 +1,46 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../common/Logo';
-import NavButton from '../common/NavButton';
 import Container from '../container/Container';
 import NavbarSkeleton from '../skeleton/NavbarSkeleton';
-import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
 
 import Profile from './Profile';
 
+import useCategory from '@/context/CategoryContext';
+
 const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
   const user = useAuth((state) => state.user);
   const navigate = useNavigate();
+  const { categoryRef } = useCategory();
+
+  const scrollToCategory = () => {
+    if (!categoryRef) {
+      navigate('/?scrollToCategory=true');
+      return;
+    }
+    categoryRef?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const {
     data: userData,
     error,
@@ -42,39 +68,51 @@ const Navbar = () => {
   }
 
   return (
-    <header className="border-b">
-      <Container className="flex items-center justify-between">
-        <a href="/" className="flex items-center gap-2">
-          <Logo className="h-7 w-7" />
-          <span>JPG Store</span>
-        </a>
-        <nav className="flex items-center gap-4 md:gap-6 mr-16">
-          <NavButton>Recent</NavButton>
-          <NavButton>Most Popular</NavButton>
-          <NavButton>Add Image</NavButton>
-          <div className="relative">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="md:block absolute left-2 top-1/2 transform -translate-y-1/2 size-5 text-muted-foreground hidden"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white border-b shadow-sm' : 'bg-transparent'
+      }`}
+    >
+      <Container className="h-16">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center justify-start gap-4">
+            <a href="/" className="flex items-center gap-2">
+              <Logo className="h-9 w-9" />
+              <span
+                className={`hidden md:text-lg md:block lg:text-2xl ${isScrolled ? 'text-black' : 'text-white'}`}
+              >
+                AI Image Store
+              </span>
+              <Separator
+                orientation="vertical"
+                className={`h-6 ml-3 hidden md:block ${isScrolled ? 'bg-gray-200' : 'bg-gray-400'}`}
               />
-            </svg>
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="pl-10 pr-4 py-2 rounded-md bg-muted text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary border-2 w-full hidden md:inline-flex"
-            />
+            </a>
+
+            <div className="flex items-center gap-4 md:gap-6 mr-14">
+              <Link to={'/images/all'}>
+                <Button
+                  variant="ghost"
+                  className={` ${isScrolled ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
+                >
+                  All Images
+                </Button>
+              </Link>
+              <div className="isolate">
+                <Button
+                  variant="ghost"
+                  onClick={scrollToCategory}
+                  className={`${isScrolled ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
+                >
+                  Categories
+                </Button>
+              </div>
+            </div>
           </div>
-          <Profile user={userData} />
-        </nav>
+          <div className="flex items-center gap-4">
+            <Profile user={userData} />
+          </div>
+        </div>
       </Container>
     </header>
   );

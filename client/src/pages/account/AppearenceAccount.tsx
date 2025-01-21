@@ -42,8 +42,7 @@ const AppearanceAccount = ({ profileImage, userId }: Props) => {
       const formData = new FormData();
       formData.append('profileImage', file);
 
-      const data = await axios.patch('/user/update-profile-image', formData);
-      console.log(data);
+      await axios.patch('/user/update-profile-image', formData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', userId] });

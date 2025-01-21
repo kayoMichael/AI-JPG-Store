@@ -19,9 +19,9 @@ const Navbar = () => {
   const user = useAuth((state) => state.user);
   const navigate = useNavigate();
   const { categoryRef } = useCategory();
-
+  const isHomePage = window.location.pathname === '/';
   const scrollToCategory = () => {
-    if (!categoryRef) {
+    if (!isHomePage) {
       navigate('/?scrollToCategory=true');
       return;
     }

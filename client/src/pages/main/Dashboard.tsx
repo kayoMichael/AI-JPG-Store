@@ -17,9 +17,11 @@ const Dashboard = () => {
     const shouldScrollToCategory = searchParams.get('scrollToCategory');
 
     if (shouldScrollToCategory === 'true' && categoryRef) {
-      categoryRef.scrollIntoView({ behavior: 'smooth' });
-      window.history.replaceState({}, '', '/');
-      setCategoryRef(null);
+      setTimeout(() => {
+        categoryRef.scrollIntoView({ behavior: 'smooth' });
+        window.history.replaceState({}, '', '/');
+        setCategoryRef(null);
+      }, 100);
     }
   }, [categoryRef, setCategoryRef]);
 

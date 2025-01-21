@@ -7,6 +7,7 @@ interface UploadToGCS {
   fileName: string;
   fileBuffer: Buffer;
   contentType?: string;
+  directory?: string;
 }
 
 interface GetSignedUrlOptions {
@@ -39,7 +40,7 @@ const upload = multer({
   },
 });
 
-async function uploadToGCS({ fileName, fileBuffer, contentType }: UploadToGCS) {
+async function uploadToGCS({ fileName, fileBuffer, contentType, directory }: UploadToGCS) {
   try {
     const storage = new Storage({
       projectId: env.GCS_PROJECT_ID,
@@ -49,7 +50,7 @@ async function uploadToGCS({ fileName, fileBuffer, contentType }: UploadToGCS) {
     const bucketName = env.GCS_BUCKET_NAME;
 
     const bucket = storage.bucket(bucketName);
-    const file = bucket.file(fileName);
+    const file = directory ? bucket.file(`${directory}/${fileName}`) : bucket.file(fileName);
 
     await file.save(fileBuffer, {
       contentType,

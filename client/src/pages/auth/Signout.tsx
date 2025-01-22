@@ -33,7 +33,7 @@ const Signout = () => {
         </h2>
       </div>
       <div className="flex justify-center mt-6">
-        <Button onClick={handleLogout}>
+        <Button onClick={handleLogout} disabled={Loading}>
           {Loading ? (
             <>
               <Spinner className="inline w-5 h-5 mr-2 fill-primary-300" /> Processing...

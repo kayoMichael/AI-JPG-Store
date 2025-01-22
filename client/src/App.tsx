@@ -7,10 +7,12 @@ import AuthLayout from './components/layout/AuthLayout';
 import SettingsLayout from './components/layout/SettingsLayout';
 import Account from './pages/account/Account';
 import AllImages from './pages/all-images/AllImages';
+import AccountCreated from './pages/auth/AccountCreated';
 import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
 import CreateImage from './pages/create/CreateImage';
+import ImageDetail from './pages/detail/ImageDetail';
 import Error from './pages/error/Error';
 import Images from './pages/image/Images';
 import Dashboard from './pages/main/Dashboard';
@@ -38,10 +40,12 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="/images/:category" element={<Images />} />
             <Route path="/images/all" element={<AllImages />} />
+            <Route path="/images/:imageCategory/:imageId" element={<ImageDetail />} />
           </Route>
           <Route path="/create" element={<CreateImage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/signup/success" element={<AccountCreated />} />
           <Route path="/signout" element={<Signout />} />
           <Route
             path="/account"

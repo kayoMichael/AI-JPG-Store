@@ -14,6 +14,7 @@ export type ImageProps = {
   objectFit?: React.CSSProperties['objectFit'];
   objectPosition?: React.CSSProperties['objectPosition'];
   placeholder?: 'blur' | 'empty';
+  fill?: boolean;
 } & Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet'>;
 
 const Image = ({
@@ -26,9 +27,10 @@ const Image = ({
   decoding = 'async',
   blurDataURL,
   priority = false,
-  objectFit,
-  objectPosition,
+  objectFit = 'cover',
+  objectPosition = 'center',
   placeholder = 'empty',
+  fill = false,
   ...rest
 }: ImageProps) => {
   const [isLoading, setLoading] = useState(true);
@@ -37,29 +39,43 @@ const Image = ({
     return classes.filter(Boolean).join(' ');
   };
 
+  // Calculate aspect ratio if width and height are provided
+  const aspectRatio = width && height ? `${width} / ${height}` : undefined;
+
   return (
-    <img
+    <div
       className={cn(
-        'transition duration-300',
-        isLoading && placeholder === 'blur' ? 'blur-sm' : 'blur-0',
+        'relative w-full h-full overflow-hidden',
+        fill ? 'absolute inset-0' : '',
         className
       )}
-      onLoad={() => setLoading(false)}
-      src={src}
-      width={width}
-      height={height}
-      loading={priority ? 'eager' : loading}
-      decoding={decoding}
       style={{
-        backgroundImage: isLoading && blurDataURL ? `url(${blurDataURL})` : 'none',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        objectFit,
-        objectPosition,
+        aspectRatio: aspectRatio,
       }}
-      alt={alt}
-      {...rest}
-    />
+    >
+      <img
+        className={cn(
+          'w-full h-full',
+          'transition duration-300',
+          isLoading && placeholder === 'blur' ? 'blur-sm' : 'blur-0'
+        )}
+        onLoad={() => setLoading(false)}
+        src={src}
+        width={width}
+        height={height}
+        loading={priority ? 'eager' : loading}
+        decoding={decoding}
+        style={{
+          backgroundImage: isLoading && blurDataURL ? `url(${blurDataURL})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          objectFit,
+          objectPosition,
+        }}
+        alt={alt}
+        {...rest}
+      />
+    </div>
   );
 };
 

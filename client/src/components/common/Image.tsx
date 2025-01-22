@@ -27,8 +27,8 @@ const Image = ({
   decoding = 'async',
   blurDataURL,
   priority = false,
-  objectFit = 'cover',
-  objectPosition = 'center',
+  objectFit,
+  objectPosition,
   placeholder = 'empty',
   fill = false,
   ...rest
@@ -39,44 +39,37 @@ const Image = ({
     return classes.filter(Boolean).join(' ');
   };
 
-  // Calculate aspect ratio if width and height are provided
-  const aspectRatio = width && height ? `${width} / ${height}` : undefined;
-
-  return (
-    <div
+  const img = (
+    <img
       className={cn(
-        'relative w-full h-full overflow-hidden',
-        fill ? 'absolute inset-0' : '',
+        'transition duration-300',
+        isLoading && placeholder === 'blur' ? 'blur-sm' : 'blur-0',
+        fill ? 'absolute h-full w-full left-0 top-0' : '',
         className
       )}
+      onLoad={() => setLoading(false)}
+      src={src}
+      width={width}
+      height={height}
+      loading={priority ? 'eager' : loading}
+      decoding={decoding}
       style={{
-        aspectRatio: aspectRatio,
+        backgroundImage: isLoading && blurDataURL ? `url(${blurDataURL})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        objectFit,
+        objectPosition,
       }}
-    >
-      <img
-        className={cn(
-          'w-full h-full',
-          'transition duration-300',
-          isLoading && placeholder === 'blur' ? 'blur-sm' : 'blur-0'
-        )}
-        onLoad={() => setLoading(false)}
-        src={src}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : loading}
-        decoding={decoding}
-        style={{
-          backgroundImage: isLoading && blurDataURL ? `url(${blurDataURL})` : 'none',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          objectFit,
-          objectPosition,
-        }}
-        alt={alt}
-        {...rest}
-      />
-    </div>
+      alt={alt}
+      {...rest}
+    />
   );
+
+  if (fill) {
+    return <div className="relative w-full h-full">{img}</div>;
+  }
+
+  return img;
 };
 
 export default Image;

@@ -16,8 +16,9 @@ export const register = async (req: Request, res: Response) => {
 
     const userId = req.session.userId;
     const user = await UserModel.findById(userId);
+    const safeFileName = `${Date.now()}-${image.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const result = await uploadToGCS({
-      fileName: title,
+      fileName: safeFileName,
       fileBuffer: image.buffer,
       contentType: image.mimetype,
       directory: category,
@@ -45,7 +46,7 @@ export const register = async (req: Request, res: Response) => {
       createdAt: new Date(),
       updatedAt: new Date(),
       visibility,
-      url: `https://storage.googleapis.com/${env.GCS_BUCKET_NAME}/Category/${category}/${title}`,
+      url: `https://storage.googleapis.com/${env.GCS_BUCKET_NAME}/Category/${category}/${safeFileName}`,
     });
     res.status(201).json({ message: 'Image Created Successfully successfully' });
   } catch {
@@ -54,9 +55,12 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const getImagesById = async (req: Request, res: Response) => {
-  const { imageId } = req.body;
+  const { imageId } = req.params;
   try {
-    const image = await ImageModel.findById(imageId);
+    const image = await ImageModel.findById(imageId).populate({
+      path: 'authorId',
+      select: 'name email profileImage',
+    });
     if (!image) {
       res.status(404).json({ error: 'Image not found' });
       return;
@@ -163,7 +167,7 @@ export const getAllImages = async (req: Request, res: Response) => {
 };
 
 export const deleteImage = async (req: Request, res: Response) => {
-  const { imageId } = req.body;
+  const { imageId } = req.params;
   try {
     const image = await ImageModel.findByIdAndDelete(imageId);
     if (!image) {

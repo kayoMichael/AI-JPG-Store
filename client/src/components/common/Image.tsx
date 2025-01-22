@@ -14,6 +14,7 @@ export type ImageProps = {
   objectFit?: React.CSSProperties['objectFit'];
   objectPosition?: React.CSSProperties['objectPosition'];
   placeholder?: 'blur' | 'empty';
+  fill?: boolean;
 } & Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet'>;
 
 const Image = ({
@@ -29,6 +30,7 @@ const Image = ({
   objectFit,
   objectPosition,
   placeholder = 'empty',
+  fill = false,
   ...rest
 }: ImageProps) => {
   const [isLoading, setLoading] = useState(true);
@@ -37,11 +39,12 @@ const Image = ({
     return classes.filter(Boolean).join(' ');
   };
 
-  return (
+  const img = (
     <img
       className={cn(
         'transition duration-300',
         isLoading && placeholder === 'blur' ? 'blur-sm' : 'blur-0',
+        fill ? 'absolute h-full w-full left-0 top-0' : '',
         className
       )}
       onLoad={() => setLoading(false)}
@@ -61,6 +64,12 @@ const Image = ({
       {...rest}
     />
   );
+
+  if (fill) {
+    return <div className="relative w-full h-full">{img}</div>;
+  }
+
+  return img;
 };
 
 export default Image;

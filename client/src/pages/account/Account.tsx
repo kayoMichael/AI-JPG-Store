@@ -47,7 +47,7 @@ const Account = () => {
           bio: response.bio,
           urls: response.urls,
         },
-        profileImage: response.profileImage || 'https://github.com/shadcn.png',
+        profileImage: response.profileImage || '/default.webp',
       };
     },
     enabled: !!user,

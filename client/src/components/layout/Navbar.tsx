@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../common/Logo';
@@ -18,6 +18,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const user = useAuth((state) => state.user);
   const navigate = useNavigate();
+  const { imageCategory } = useParams();
   const { categoryRef } = useCategory();
   const isHomePage = window.location.pathname === '/';
   const scrollToCategory = () => {
@@ -70,7 +71,7 @@ const Navbar = () => {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white border-b shadow-sm' : 'bg-transparent'
+        isScrolled || imageCategory ? 'bg-white border-b shadow-sm' : 'bg-transparent'
       }`}
     >
       <Container className="h-16">
@@ -79,13 +80,13 @@ const Navbar = () => {
             <a href="/" className="flex items-center gap-2">
               <Logo className="h-9 w-9" />
               <span
-                className={`hidden md:text-lg md:block lg:text-2xl ${isScrolled ? 'text-black' : 'text-white'}`}
+                className={`hidden md:text-lg md:block lg:text-2xl ${isScrolled || imageCategory ? 'text-black' : 'text-white'}`}
               >
                 AI Image Store
               </span>
               <Separator
                 orientation="vertical"
-                className={`h-6 ml-3 hidden md:block ${isScrolled ? 'bg-gray-200' : 'bg-gray-400'}`}
+                className={`h-6 ml-3 hidden md:block ${isScrolled || imageCategory ? 'bg-gray-200' : 'bg-gray-400'}`}
               />
             </a>
 
@@ -93,7 +94,7 @@ const Navbar = () => {
               <Link to={'/images/all'}>
                 <Button
                   variant="ghost"
-                  className={` ${isScrolled ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
+                  className={` ${isScrolled || imageCategory ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
                 >
                   All Images
                 </Button>
@@ -102,7 +103,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   onClick={scrollToCategory}
-                  className={`${isScrolled ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
+                  className={`${isScrolled || imageCategory ? 'text-gray-700' : 'text-white hover:bg-gray-400'}`}
                 >
                   Categories
                 </Button>

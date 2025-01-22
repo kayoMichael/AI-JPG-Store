@@ -50,7 +50,9 @@ async function uploadToGCS({ fileName, fileBuffer, contentType, directory }: Upl
     const bucketName = env.GCS_BUCKET_NAME;
 
     const bucket = storage.bucket(bucketName);
-    const file = directory ? bucket.file(`${directory}/${fileName}`) : bucket.file(fileName);
+    const file = directory
+      ? bucket.file(`Category/${directory}/${fileName}`)
+      : bucket.file(fileName);
 
     await file.save(fileBuffer, {
       contentType,

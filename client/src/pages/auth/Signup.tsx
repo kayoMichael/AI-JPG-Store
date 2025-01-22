@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Logo from '../../components/common/Logo';
 import Spinner from '../../components/common/Spinner';
@@ -19,6 +19,7 @@ type FormErrors = {
 const SignUp = () => {
   const [Loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,9 +53,11 @@ const SignUp = () => {
         email: data.email,
         password: data.password,
       });
+      eventContext.reset();
+      setLoading(false);
+      navigate('/signup/success');
     } catch {
       setErrors((prev) => ({ ...prev, email: 'This Email is Already Registered. Please Sign In' }));
-    } finally {
       eventContext.reset();
       setLoading(false);
     }

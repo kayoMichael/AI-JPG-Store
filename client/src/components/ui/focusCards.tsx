@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Image from '../common/Image';
 
@@ -20,10 +21,12 @@ export const Card = React.memo(
     type: 'main' | 'category';
   }) => {
     const aiModel = AiModels.find((model) => model.id === parseInt(card.aiModel));
+    const navigate = useNavigate();
     return (
       <div
         onMouseEnter={() => setHovered(index)}
         onMouseLeave={() => setHovered(null)}
+        onClick={() => navigate(`/images/${card.category}/${card._id}`)}
         className={cn(
           'rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-80 w-full transition-all duration-300 ease-out',
           hovered !== null && hovered !== index && 'blur-sm scale-[0.98]'
@@ -76,6 +79,7 @@ type Card = {
   authorId: { name: string };
   likes: number;
   aiModel: string;
+  _id: string;
 };
 
 export function FocusCards({ cards, type }: { cards: Card[]; type: 'main' | 'category' }) {

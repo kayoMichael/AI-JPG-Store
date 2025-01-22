@@ -41,7 +41,7 @@ const formSchema = z.object({
       (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
       'Only .jpg, .png, .gif, and .svg formats are supported'
     ),
-  description: z.string().max(600, 'Description must be less than 600 characters'),
+  description: z.string().max(2000, 'Description must be less than 600 characters'),
   imagePreview: z.string().nullable(),
   aiModel: z
     .number()
@@ -213,18 +213,6 @@ const ImageForm = () => {
                     <p className="text-gray-600">{model.description}</p>
                   </Card>
                 ))}
-
-                <Card
-                  className={cn(
-                    'p-6 cursor-pointer border hover:border-purple-400 transition-colors min-w-1/3',
-                    field.value === 80 && 'border-purple-400 border-2'
-                  )}
-                  onClick={() => handleModelSelect(80)}
-                >
-                  <div className="text-center flex justify-center items-center">
-                    <span className="font-semibold text-lg mt-14">Other Model</span>
-                  </div>
-                </Card>
               </div>
             )}
           />
@@ -232,12 +220,10 @@ const ImageForm = () => {
         </div>
         <div className="py-10"></div>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 -mr-60">
-          <div className="max-w-screen-xl mx-auto flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading && <Spinner />}Create Image
-            </Button>
-          </div>
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-end">
+          <Button type="submit" disabled={loading}>
+            {loading && <Spinner />}Create Image
+          </Button>
         </div>
       </div>
     </form>

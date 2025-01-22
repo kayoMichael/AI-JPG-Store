@@ -38,3 +38,12 @@ export const AiModels = [
   },
   { id: 80, name: 'Other Model', description: 'Another AI model', badge: 'Other', image: null },
 ];
+
+export const findAiModel = (id: number) =>
+  AiModels.find((model) => model.id === id) || {
+    id: 80,
+    name: 'Other Model',
+    description: 'Another AI model',
+    badge: 'Other',
+    image: null,
+  };

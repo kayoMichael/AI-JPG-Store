@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 import { Button } from '@/components/ui/button';
 
 const Error = () => {
@@ -12,9 +10,9 @@ const Error = () => {
 
         <p className="mt-4 text-gray-500">Some Thing Went Wrong...</p>
 
-        <Link to={'/'}>
+        <a href={'/'}>
           <Button className="mt-10">Go Back Home</Button>
-        </Link>
+        </a>
       </div>
     </div>
   );

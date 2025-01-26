@@ -1,8 +1,8 @@
-import { SortAsc, Clock, CalendarDays } from 'lucide-react';
+import { SortAsc, Clock, CalendarDays, Star } from 'lucide-react';
 
 import { cn } from '@/utils/merge';
 
-type SortOption = 'newest' | 'oldest' | 'alphabetical';
+type SortOption = 'newest' | 'oldest' | 'alphabetical' | 'trending';
 
 const SortingControls = ({
   onSortChange,
@@ -30,6 +30,11 @@ const SortingControls = ({
       id: 'alphabetical',
       icon: SortAsc,
       label: 'A-Z',
+    },
+    {
+      id: 'trending',
+      icon: Star,
+      label: 'Trending',
     },
   ];
 

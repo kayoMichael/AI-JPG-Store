@@ -22,7 +22,9 @@ const Images = () => {
   const [uniqueAuthors, setUniqueAuthors] = useState<number>(0);
   const [totalLikes, setTotalLikes] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
+  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
+    'newest'
+  );
   const [sorting, setSorting] = useState<{ sortBy: string; order: string }>({
     sortBy: 'createdAt',
     order: 'desc',
@@ -155,7 +157,7 @@ const Images = () => {
     return items;
   };
 
-  const handleSortChange = (option: 'newest' | 'oldest' | 'alphabetical') => {
+  const handleSortChange = (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => {
     setActiveSort(option);
     if (option === 'oldest') {
       setSorting({ sortBy: 'createdAt', order: 'asc' });
@@ -163,6 +165,8 @@ const Images = () => {
       setSorting({ sortBy: 'createdAt', order: 'desc' });
     } else if (option === 'alphabetical') {
       setSorting({ sortBy: 'lexicographical', order: 'desc' });
+    } else if (option === 'trending') {
+      setSorting({ sortBy: 'likes', order: 'desc' });
     }
   };
 
@@ -215,7 +219,9 @@ const Images = () => {
       </div>
       <SortingControls
         activeSort={activeSort}
-        onSortChange={(option: 'newest' | 'oldest' | 'alphabetical') => handleSortChange(option)}
+        onSortChange={(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') =>
+          handleSortChange(option)
+        }
       />
       <FocusCards cards={data} type="category" />
       <div className="mt-10">

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Types } from 'mongoose';
 
 import LikeModel, { RequestLikeSchema } from './../models/Likes.js';
 
@@ -11,7 +12,7 @@ export const getUserLikeStatus = async (imageId: string, userId: string) => {
   return !!like;
 };
 
-export const getLikeCounts = async (imageIds: string[]) => {
+export const getLikeCounts = async (imageIds: Types.ObjectId[]) => {
   const likeCounts = await LikeModel.aggregate([
     {
       $match: {

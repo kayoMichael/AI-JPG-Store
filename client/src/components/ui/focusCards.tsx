@@ -1,3 +1,4 @@
+import { Heart } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -46,22 +47,38 @@ export const Card = React.memo(
           )}
         >
           {type === 'main' ? (
-            <div className="flex flex-col gap-2">
+            <div className="w-full max-w-md flex flex-col gap-2 p-4">
               <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
                 {card.title}
               </div>
-              <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
-                {card.category}
-              </p>
+              <div className="flex gap-2 items-center justify-between">
+                <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+                  {card.category}
+                </p>
+                <div className="flex gap-2 items-center">
+                  <Heart strokeWidth={2} className="h-4 w-4" color="red" />
+                  <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+                    {card.likes}
+                  </p>
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="w-full max-w-md flex flex-col gap-2 p-4">
               <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
                 {card.title}
               </div>
-              <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
-                {aiModel?.name}
-              </p>
+              <div className="flex gap-2 items-center justify-between">
+                <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+                  {aiModel?.name}
+                </p>
+                <div className="flex gap-2 items-center">
+                  <Heart strokeWidth={2} className="h-4 w-4" color="red" />
+                  <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+                    {card.likes}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>

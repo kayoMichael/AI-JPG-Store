@@ -18,7 +18,9 @@ import {
 const Trending = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
+  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
+    'newest'
+  );
   const [sorting, setSorting] = useState<{ sortBy: string; order: string }>({
     sortBy: 'createdAt',
     order: 'desc',
@@ -125,24 +127,30 @@ const Trending = () => {
     return items;
   };
 
-  const handleSortChange = (option: 'newest' | 'oldest' | 'alphabetical') => {
+  const handleSortChange = (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => {
     setActiveSort(option);
     if (option === 'oldest') {
       setSorting({ sortBy: 'createdAt', order: 'asc' });
     } else if (option === 'newest') {
       setSorting({ sortBy: 'createdAt', order: 'desc' });
     } else if (option === 'alphabetical') {
-      setSorting({ sortBy: 'lexicographical', order: 'desc' });
+      setSorting({ sortBy: 'lexicographical', order: 'asc' });
+    } else if (option === 'trending') {
+      setSorting({ sortBy: 'likes', order: 'desc' });
     }
   };
   return (
     <>
       <div className="text-5xl mb-14 text-white">All Images</div>
-      <SortingControls
-        activeSort={activeSort}
-        onSortChange={(option: 'newest' | 'oldest' | 'alphabetical') => handleSortChange(option)}
-      />
-      <FocusCards cards={data} type="main" />
+      <div className="min-h-[400px]">
+        <SortingControls
+          activeSort={activeSort}
+          onSortChange={(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') =>
+            handleSortChange(option)
+          }
+        />
+        <FocusCards cards={data} type="main" />
+      </div>
       <div className="mt-10">
         <Pagination>
           <PaginationContent>{renderPaginationItems()}</PaginationContent>

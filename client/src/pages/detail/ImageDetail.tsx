@@ -1,20 +1,40 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Heart, Download } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import Image from '@/components/common/Image';
+import DetailSkeleton from '@/components/skeleton/DetailSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { FocusCards } from '@/components/ui/focusCards';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { findAiModel } from '@/constant/AiModels';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { capitalize } from '@/utils/capitalise';
 
 export default function ImageDetail() {
+  const { pathname } = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [liked, setLiked] = useState(false);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   const navigate = useNavigate();
   const { imageId, imageCategory } = useParams();
   const { data, isLoading, isError } = useQuery({
@@ -31,6 +51,7 @@ export default function ImageDetail() {
         (image: { _id: string }) => image._id !== imageId
       );
       const targetImage = response[1];
+      setLiked(targetImage.liked);
       return { targetImage, similarImages };
     },
     staleTime: 0,
@@ -44,7 +65,47 @@ export default function ImageDetail() {
     }
   });
 
-  if (isLoading) return null;
+  const handleLike = async () => {
+    if (!user) {
+      setOpen(true);
+      return;
+    }
+    const previousLiked = liked;
+    const previousLikes = data?.targetImage.likes;
+
+    setLiked(!liked);
+    queryClient.setQueryData(['imageDetail', imageId], (oldData: any) => ({
+      ...oldData,
+      targetImage: {
+        ...oldData.targetImage,
+        likes: liked ? oldData.targetImage.likes - 1 : oldData.targetImage.likes + 1,
+      },
+    }));
+
+    try {
+      await axios.post('/likes/register', {
+        action: !liked ? 'like' : 'unlike',
+        imageId,
+      });
+    } catch {
+      setLiked(previousLiked);
+      queryClient.setQueryData(['imageDetail', imageId], (oldData: any) => ({
+        ...oldData,
+        targetImage: {
+          ...oldData.targetImage,
+          likes: previousLikes,
+        },
+      }));
+
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to update like status. Please try again.',
+      });
+    }
+  };
+
+  if (isLoading) return <DetailSkeleton />;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -75,8 +136,12 @@ export default function ImageDetail() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="icon" disabled>
-                <Heart className="h-4 w-4" />
+              <Button variant="outline" size="icon" onClick={() => handleLike()}>
+                {liked ? (
+                  <Heart fill="red" strokeWidth={0} className="h-4 w-4" />
+                ) : (
+                  <Heart className="h-4 w-4" />
+                )}
               </Button>
               <span className="text-sm font-medium">{data?.targetImage.likes}</span>
               <Button variant="outline" size="icon" disabled>
@@ -113,6 +178,22 @@ export default function ImageDetail() {
         <h3 className="text-2xl font-semibold mb-4">Similar Images</h3>
         <FocusCards cards={data?.similarImages} type="category" />
       </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Account Required!</DialogTitle>
+            <DialogDescription>
+              Please sign in to like or download images. If you don&apos;t have an account, you can
+              create one for free.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Link to={'/login'}>
+              <Button>Sign In</Button>
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

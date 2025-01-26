@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import Container from './components/container/Container';
 import DynamicCover from './components/layout/DynamicCover';
 import Navbar from './components/layout/Navbar';
+import { Toaster } from './components/ui/toaster';
 
 export default function Layout() {
   const { category } = useParams();
@@ -27,6 +28,7 @@ export default function Layout() {
           </Container>
         </>
       )}
+      <Toaster />
     </>
   );
 }

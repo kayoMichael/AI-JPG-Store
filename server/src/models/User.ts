@@ -15,6 +15,13 @@ export interface IUser {
   favourites?: string[];
 }
 
+export interface IImageUser {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  profileImage?: string;
+}
+
 const UserSchema = new Schema<IUser>({
   name: String,
   email: { type: String, unique: true },

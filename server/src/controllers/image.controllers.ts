@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 
 import { env } from '../config/env.js';
 import { uploadToGCS } from '../config/storage.js';
-import ImageModel, { RegisterImageSchema, Category } from '../models/Image.js';
+import ImageModel, { RegisterImageSchema, Category, IPopulatedImage } from '../models/Image.js';
 import UserModel from '../models/User.js';
 import { getEnumValue } from '../utils/enum.js';
 
-import { getLikeCount, getLikeCounts } from './like.controllers.js';
+import { getLikeCount, getLikeCounts, getUserLikeStatus } from './like.controllers.js';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -57,7 +57,8 @@ export const register = async (req: Request, res: Response) => {
 export const getImagesById = async (req: Request, res: Response) => {
   const { imageId } = req.params;
   try {
-    const image = await ImageModel.findById(imageId).populate({
+    const userId = req.session.userId;
+    const image = await ImageModel.findById(imageId).populate<IPopulatedImage>({
       path: 'authorId',
       select: 'name email profileImage',
     });
@@ -65,8 +66,19 @@ export const getImagesById = async (req: Request, res: Response) => {
       res.status(404).json({ error: 'Image not found' });
       return;
     }
+    let likedStatus = false;
+    if (userId) {
+      likedStatus = await getUserLikeStatus(imageId, userId);
+    }
+
     const likeCount = await getLikeCount(imageId);
-    const imageWithLike = { ...image.toObject(), likes: likeCount };
+    const userPostCount = await ImageModel.countDocuments({ authorId: image.authorId._id });
+    const imageWithLike = {
+      ...image.toObject(),
+      likes: likeCount,
+      AuthorPostCount: userPostCount,
+      liked: likedStatus,
+    };
     res.status(200).json(imageWithLike);
   } catch {
     res.status(500).json({ error: 'Internal Server Error' });

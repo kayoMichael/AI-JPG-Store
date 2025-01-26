@@ -11,16 +11,18 @@ import {
 import { DirectionAwareHover } from '@/components/ui/heroCard';
 
 interface Props {
-  featuredData: {
-    _id: string;
-    title: string;
-    url: string;
-    category: string;
-    authorId: { name: string };
-  }[];
+  _id: string;
+  title: string;
+  url: string;
+  category: string;
+  authorId: { name: string };
 }
 
-export const CarouselCards = ({ featuredData }: Props) => {
+type CarouselCardsProps = {
+  featuredData: Props[];
+};
+
+export const CarouselCards = ({ featuredData }: CarouselCardsProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [itemsToShow, setItemsToShow] = useState(1);
 
@@ -82,7 +84,11 @@ export const CarouselCards = ({ featuredData }: Props) => {
             >
               <div className="relative h-64 sm:h-72 md:h-80 lg:h-96">
                 <div className="w-full aspect[1/1">
-                  <DirectionAwareHover imageUrl={card.url}>
+                  <DirectionAwareHover
+                    imageUrl={card.url}
+                    imageId={card._id}
+                    imageCategory={card.category}
+                  >
                     <div className="p-4">
                       <p className="font-bold text-base sm:text-lg md:text-xl mb-2">{card.title}</p>
                       <p className="font-normal text-xs sm:text-sm">{card.category}</p>

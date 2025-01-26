@@ -55,7 +55,6 @@ const FileUploadArea = ({ register, watch, setValue }: Props) => {
         <div className="text-center">
           <ImageIcon className="w-12 h-12 mx-auto mb-4 text-gray-400" />
           <h3 className="text-xl font-semibold mb-2">Drag and drop or click to upload</h3>
-          <p className="text-gray-600 mb-2">You may change this after deploying your contract.</p>
           <p className="text-gray-600">
             Recommended size: 350 x 350. File types: JPG, PNG, SVG, or GIF
           </p>

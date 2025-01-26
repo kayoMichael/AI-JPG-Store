@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { z } from 'zod';
 
+import { IImageUser } from './User.js';
+
 const { Schema } = mongoose;
 
 export enum Category {
@@ -43,6 +45,10 @@ const ImageSchema = new Schema<IImage>({
   visibility: { type: String, enum: ['public', 'private'], required: true },
 });
 
+export interface IPopulatedImage extends Omit<IImage, 'authorId'> {
+  authorId: IImageUser;
+}
+
 const MulterFileSchema = z.object({
   fieldname: z.string(),
   originalname: z.string(),
@@ -66,6 +72,7 @@ export const RegisterImageSchema = z.object({
 ImageSchema.index({ category: 1, createdAt: 1 }, { background: true });
 ImageSchema.index({ authorId: 1, createdAt: 1 }, { background: true });
 ImageSchema.index({ name: 1 }, { background: true });
+ImageSchema.index({ authorId: 1 }, { background: true });
 
 const ImageModel = mongoose.model('Image', ImageSchema);
 

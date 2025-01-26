@@ -18,6 +18,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { FocusCards } from '@/components/ui/focusCards';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { findAiModel } from '@/constant/AiModels';
@@ -74,13 +81,16 @@ export default function ImageDetail() {
     const previousLikes = data?.targetImage.likes;
 
     setLiked(!liked);
-    queryClient.setQueryData(['imageDetail', imageId], (oldData: any) => ({
-      ...oldData,
-      targetImage: {
-        ...oldData.targetImage,
-        likes: liked ? oldData.targetImage.likes - 1 : oldData.targetImage.likes + 1,
-      },
-    }));
+    queryClient.setQueryData(
+      ['imageDetail', imageId],
+      (oldData: { targetImage: { likes: number } }) => ({
+        ...oldData,
+        targetImage: {
+          ...oldData.targetImage,
+          likes: liked ? oldData.targetImage.likes - 1 : oldData.targetImage.likes + 1,
+        },
+      })
+    );
 
     try {
       await axios.post('/likes/register', {
@@ -89,13 +99,16 @@ export default function ImageDetail() {
       });
     } catch {
       setLiked(previousLiked);
-      queryClient.setQueryData(['imageDetail', imageId], (oldData: any) => ({
-        ...oldData,
-        targetImage: {
-          ...oldData.targetImage,
-          likes: previousLikes,
-        },
-      }));
+      queryClient.setQueryData(
+        ['imageDetail', imageId],
+        (oldData: { targetImage: { likes: number } }) => ({
+          ...oldData,
+          targetImage: {
+            ...oldData.targetImage,
+            likes: previousLikes,
+          },
+        })
+      );
 
       toast({
         variant: 'destructive',
@@ -109,7 +122,7 @@ export default function ImageDetail() {
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-2 gap-8">
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
           <Image
             src={data?.targetImage.url}
@@ -119,17 +132,59 @@ export default function ImageDetail() {
             className="transition-transform duration-300 hover:scale-105"
           />
         </div>
-        <div className="space-y-6">
+        <div className="space-y-6 aspect-[4/3] lg:aspect-[3/2]">
           <h1 className="text-3xl font-bold">{data?.targetImage.title}</h1>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Avatar>
-                <AvatarImage
-                  src={data?.targetImage.authorId.profileImage || '/default.webp'}
-                  alt="user"
-                />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-12 w-12 rounded-full">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage
+                        src={data?.targetImage.authorId.profileImage || '/default.webp'}
+                        alt="user"
+                      />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="center" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {data?.targetImage.authorId.name}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {data?.targetImage.authorId.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="p-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-lg font-semibold">1</p>
+                        <p className="text-xs text-muted-foreground">Total Liked Posts</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-lg font-semibold">54</p>
+                        <p className="text-xs text-muted-foreground">Account Maturity</p>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator className="my-2" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-lg font-semibold">12</p>
+                        <p className="text-xs text-muted-foreground">Total posts</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-lg font-semibold">238</p>
+                        <p className="text-xs text-muted-foreground">Total likes</p>
+                      </div>
+                    </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <div>
                 <h2 className="text-xl font-semibold">{data?.targetImage.authorId.name}</h2>
                 <Badge variant="secondary">{data?.targetImage.category}</Badge>
@@ -150,7 +205,7 @@ export default function ImageDetail() {
             </div>
           </div>
 
-          <ScrollArea className="h-1/3 w-full rounded-md border p-4 md:h-2/3">
+          <ScrollArea className="h-1/3 md:h-4/5 w-full rounded-md border p-4 ">
             <div className="pr-4">
               <ReactMarkdown
                 className="prose prose-sm max-w-none text-muted-foreground"
@@ -167,10 +222,14 @@ export default function ImageDetail() {
               </ReactMarkdown>
             </div>
           </ScrollArea>
-
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-            {findAiModel(parseInt(data?.targetImage.aiModel)).image}
-            <span>Generated by {findAiModel(parseInt(data?.targetImage.aiModel)).name}</span>
+          <div className="flex justify-between">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              {findAiModel(parseInt(data?.targetImage.aiModel)).image}
+              <span>Generated by {findAiModel(parseInt(data?.targetImage.aiModel)).name}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <span>Posted on {new Date(data?.targetImage.createdAt).toLocaleDateString()}</span>
+            </div>
           </div>
         </div>
       </div>

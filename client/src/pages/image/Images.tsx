@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import Footer from '@/components/common/Footer';
 import SortingControls from '@/components/layout/FeatureButton';
 import { FocusCards } from '@/components/ui/focusCards';
 import {
@@ -221,6 +222,9 @@ const Images = () => {
         <Pagination>
           <PaginationContent>{renderPaginationItems()}</PaginationContent>
         </Pagination>
+      </div>
+      <div className="-mx-24 -mb-10 mt-10">
+        <Footer />
       </div>
     </>
   );

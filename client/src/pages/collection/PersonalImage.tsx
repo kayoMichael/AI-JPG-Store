@@ -1,11 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { PaginatedContent } from '@/components/layout/PaginatedContent';
-import { FocusCards } from '@/components/ui/focusCards';
-import { Card } from '@/components/ui/focusCards';
+import { FocusCards, Card } from '@/components/ui/focusCards';
+import { useAuth } from '@/context/AuthContext';
 import { usePagination } from '@/hooks/use-pagination';
-
-const Trending = () => {
+const PersonalImages = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  });
   const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
     'newest'
   );
@@ -14,6 +21,7 @@ const Trending = () => {
     queryKey: 'trendingImages',
     apiUrl: '/images/get',
     itemsPerPage: 24,
+    userId: user?.id,
   });
 
   const handleSort = (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => {
@@ -23,8 +31,8 @@ const Trending = () => {
 
   return (
     <PaginatedContent
-      title="All Images"
-      data={data || []}
+      title="My Created Images"
+      data={data}
       isLoading={isLoading}
       activeSort={activeSort}
       pagination={pagination}
@@ -35,4 +43,4 @@ const Trending = () => {
   );
 };
 
-export default Trending;
+export default PersonalImages;

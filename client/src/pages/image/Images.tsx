@@ -3,7 +3,10 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import Footer from '@/components/common/Footer';
+import DynamicCover from '@/components/layout/DynamicCover';
 import SortingControls from '@/components/layout/FeatureButton';
+import AllImagesSkeleton from '@/components/skeleton/AllImageSkeleton';
 import { FocusCards } from '@/components/ui/focusCards';
 import {
   Pagination,
@@ -21,7 +24,9 @@ const Images = () => {
   const [uniqueAuthors, setUniqueAuthors] = useState<number>(0);
   const [totalLikes, setTotalLikes] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
+  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
+    'newest'
+  );
   const [sorting, setSorting] = useState<{ sortBy: string; order: string }>({
     sortBy: 'createdAt',
     order: 'desc',
@@ -75,7 +80,13 @@ const Images = () => {
   }, [isError, navigate]);
 
   if (isLoading) {
-    return null;
+    return (
+      <>
+        <DynamicCover />
+        <div className="mt-96"></div>
+        <AllImagesSkeleton activeSort={activeSort} onSortChange={handleSortChange} />
+      </>
+    );
   }
 
   if (!data || data.length === 0) {
@@ -89,6 +100,12 @@ const Images = () => {
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= (pagination?.totalPages || 1)) {
       setCurrentPage(page);
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }, 50);
     }
   };
 
@@ -154,16 +171,18 @@ const Images = () => {
     return items;
   };
 
-  const handleSortChange = (option: 'newest' | 'oldest' | 'alphabetical') => {
+  function handleSortChange(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') {
     setActiveSort(option);
     if (option === 'oldest') {
       setSorting({ sortBy: 'createdAt', order: 'asc' });
     } else if (option === 'newest') {
       setSorting({ sortBy: 'createdAt', order: 'desc' });
     } else if (option === 'alphabetical') {
-      setSorting({ sortBy: 'lexicographical', order: 'desc' });
+      setSorting({ sortBy: 'lexicographical', order: 'asc' });
+    } else if (option === 'trending') {
+      setSorting({ sortBy: 'likes', order: 'desc' });
     }
-  };
+  }
 
   return (
     <>
@@ -214,13 +233,18 @@ const Images = () => {
       </div>
       <SortingControls
         activeSort={activeSort}
-        onSortChange={(option: 'newest' | 'oldest' | 'alphabetical') => handleSortChange(option)}
+        onSortChange={(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') =>
+          handleSortChange(option)
+        }
       />
       <FocusCards cards={data} type="category" />
       <div className="mt-10">
         <Pagination>
           <PaginationContent>{renderPaginationItems()}</PaginationContent>
         </Pagination>
+      </div>
+      <div className="-mx-24 -mb-10 mt-10">
+        <Footer />
       </div>
     </>
   );

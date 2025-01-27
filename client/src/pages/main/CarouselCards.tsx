@@ -11,16 +11,19 @@ import {
 import { DirectionAwareHover } from '@/components/ui/heroCard';
 
 interface Props {
-  featuredData: {
-    _id: string;
-    title: string;
-    url: string;
-    category: string;
-    authorId: { name: string };
-  }[];
+  _id: string;
+  title: string;
+  url: string;
+  category: string;
+  likes: number;
+  authorId: { name: string };
 }
 
-export const CarouselCards = ({ featuredData }: Props) => {
+type CarouselCardsProps = {
+  featuredData: Props[];
+};
+
+export const CarouselCards = ({ featuredData }: CarouselCardsProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [itemsToShow, setItemsToShow] = useState(1);
 
@@ -81,11 +84,20 @@ export const CarouselCards = ({ featuredData }: Props) => {
               }`}
             >
               <div className="relative h-64 sm:h-72 md:h-80 lg:h-96">
-                <div className="w-full aspect[1/1">
-                  <DirectionAwareHover imageUrl={card.url}>
-                    <div className="p-4">
-                      <p className="font-bold text-base sm:text-lg md:text-xl mb-2">{card.title}</p>
-                      <p className="font-normal text-xs sm:text-sm">{card.category}</p>
+                <div className="w-full h-full aspect-[1/1]">
+                  <DirectionAwareHover
+                    imageUrl={card.url}
+                    imageId={card._id}
+                    imageCategory={card.category}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex flex-col p-4">
+                      <div className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+                        {card.title}
+                      </div>
+                      <p className="text-sm bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+                        {card.category}
+                      </p>
                     </div>
                   </DirectionAwareHover>
                 </div>

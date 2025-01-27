@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Types } from 'mongoose';
 
 import LikeModel, { RequestLikeSchema } from './../models/Likes.js';
 
@@ -6,7 +7,12 @@ export const getLikeCount = async (imageId: string) => {
   return await LikeModel.countDocuments({ imageId });
 };
 
-export const getLikeCounts = async (imageIds: string[]) => {
+export const getUserLikeStatus = async (imageId: string, userId: string) => {
+  const like = await LikeModel.findOne({ imageId, userId });
+  return !!like;
+};
+
+export const getLikeCounts = async (imageIds: Types.ObjectId[]) => {
   const likeCounts = await LikeModel.aggregate([
     {
       $match: {
@@ -32,9 +38,17 @@ export const getLikeCounts = async (imageIds: string[]) => {
 
 export const registerLike = async (req: Request, res: Response) => {
   try {
-    const { imageId } = await RequestLikeSchema.parseAsync(req.body);
+    const { imageId, action } = await RequestLikeSchema.parseAsync(req.body);
     const userId = req.session.userId;
-
+    if (action == 'unlike') {
+      const result = await LikeModel.deleteOne({ imageId, userId });
+      if (result.deletedCount === 0) {
+        res.status(400).json({ error: 'Like does not exist' });
+        return;
+      }
+      res.status(200).json({ message: 'Like removed successfully' });
+      return;
+    }
     const existingLike = await LikeModel.findOne({ imageId, userId });
     if (existingLike) {
       res.status(400).json({ error: 'Like already exists' });
@@ -54,31 +68,9 @@ export const registerLike = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteLike = async (req: Request, res: Response) => {
-  try {
-    const { imageId } = await RequestLikeSchema.parseAsync(req.body);
-    const userId = req.session.userId;
-
-    const result = await LikeModel.deleteOne({ imageId, userId });
-    if (result.deletedCount === 0) {
-      res.status(404).json({ error: 'Like not found' });
-      return;
-    }
-
-    const likeCount = await getLikeCount(imageId);
-    res.status(200).json({
-      message: 'Like deleted successfully',
-      likeCount,
-    });
-  } catch (error) {
-    console.error('Error in deleteLike:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
 export const getLike = async (req: Request, res: Response) => {
   try {
-    const { imageId } = req.body;
+    const { imageId } = req.params;
     const userId = req.session.userId;
 
     const like = await LikeModel.findOne({ imageId, userId });

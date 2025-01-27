@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 
 import { env } from '../config/env.js';
 import { uploadToGCS } from '../config/storage.js';
-import ImageModel, { RegisterImageSchema, Category } from '../models/Image.js';
+import ImageModel, { RegisterImageSchema, Category, IPopulatedImage } from '../models/Image.js';
 import UserModel from '../models/User.js';
 import { getEnumValue } from '../utils/enum.js';
 
-import { getLikeCount, getLikeCounts } from './like.controllers.js';
+import { getLikeCount, getLikeCounts, getUserLikeStatus } from './like.controllers.js';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -57,7 +57,8 @@ export const register = async (req: Request, res: Response) => {
 export const getImagesById = async (req: Request, res: Response) => {
   const { imageId } = req.params;
   try {
-    const image = await ImageModel.findById(imageId).populate({
+    const userId = req.session.userId;
+    const image = await ImageModel.findById(imageId).populate<IPopulatedImage>({
       path: 'authorId',
       select: 'name email profileImage',
     });
@@ -65,8 +66,19 @@ export const getImagesById = async (req: Request, res: Response) => {
       res.status(404).json({ error: 'Image not found' });
       return;
     }
+    let likedStatus = false;
+    if (userId) {
+      likedStatus = await getUserLikeStatus(imageId, userId);
+    }
+
     const likeCount = await getLikeCount(imageId);
-    const imageWithLike = { ...image.toObject(), likes: likeCount };
+    const userPostCount = await ImageModel.countDocuments({ authorId: image.authorId._id });
+    const imageWithLike = {
+      ...image.toObject(),
+      likes: likeCount,
+      AuthorPostCount: userPostCount,
+      liked: likedStatus,
+    };
     res.status(200).json(imageWithLike);
   } catch {
     res.status(500).json({ error: 'Internal Server Error' });
@@ -105,7 +117,80 @@ export const getAllImages = async (req: Request, res: Response) => {
 
     const sortObject: Record<string, 1 | -1> = {};
     if (sortBy === 'lexicographical') {
-      sortObject.name = order === 'asc' ? 1 : -1;
+      sortObject.title = order === 'asc' ? 1 : -1;
+    } else if (sortBy === 'likes') {
+      const pipeline: PipelineStage[] = [
+        ...(category
+          ? [
+              {
+                $match: {
+                  category: category,
+                },
+              },
+            ]
+          : []),
+        {
+          $lookup: {
+            from: 'likes',
+            localField: '_id',
+            foreignField: 'imageId',
+            pipeline: [{ $count: 'count' }],
+            as: 'likesCount',
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'authorId',
+            foreignField: '_id',
+            as: 'author',
+          },
+        },
+        { $unwind: '$author' },
+        {
+          $addFields: {
+            likes: {
+              $ifNull: [{ $arrayElemAt: ['$likesCount.count', 0] }, 0],
+            },
+          },
+        },
+        {
+          $project: {
+            likesCount: 0,
+          },
+        },
+        {
+          $sort: {
+            likes: order === 'asc' ? 1 : -1,
+            createdAt: -1,
+          },
+        },
+        { $skip: skip },
+        { $limit: limitNum },
+      ];
+      const [images, totalCount] = await Promise.all([
+        ImageModel.aggregate(pipeline),
+        ImageModel.countDocuments(),
+      ]);
+
+      res.status(200).json({
+        images,
+        pagination: {
+          currentPage: pageNum,
+          totalPages: Math.ceil(totalCount / limitNum),
+          totalItems: totalCount,
+          itemsPerPage: limitNum,
+          hasNextPage: pageNum < Math.ceil(totalCount / limitNum),
+          hasPrevPage: pageNum > 1,
+        },
+        filters: {
+          category: category || null,
+          authorId: authorId || null,
+          sortBy,
+          order,
+        },
+      });
+      return;
     } else {
       sortObject.createdAt = order === 'asc' ? 1 : -1;
     }
@@ -131,7 +216,7 @@ export const getAllImages = async (req: Request, res: Response) => {
       ImageModel.countDocuments(queryObject),
     ]);
 
-    const imageIds = images.map((img) => String(img._id));
+    const imageIds = images.map((img) => img._id);
     const likeCounts = await getLikeCounts(imageIds);
 
     const imagesWithLikes = images.map((img) => ({

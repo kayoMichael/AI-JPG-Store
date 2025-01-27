@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Image from '../common/Image';
 
@@ -7,19 +8,23 @@ import { cn } from '@/utils/merge';
 
 export const DirectionAwareHover = ({
   imageUrl,
+  imageCategory,
+  imageId,
   children,
   childrenClassName,
   imageClassName,
   className,
 }: {
   imageUrl: string;
+  imageCategory: string;
+  imageId: string;
   children: React.ReactNode | string;
   childrenClassName?: string;
   imageClassName?: string;
   className?: string;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-
+  const navigate = useNavigate();
   const [direction, setDirection] = useState<'top' | 'bottom' | 'left' | 'right' | string>('left');
 
   const handleMouseEnter = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -57,6 +62,7 @@ export const DirectionAwareHover = ({
     <motion.div
       onMouseEnter={handleMouseEnter}
       ref={ref}
+      onClick={() => navigate(`/images/${imageCategory}/${imageId}`)}
       className={cn(
         'h-full w-full bg-transparent rounded-lg overflow-hidden group/card relative',
         className

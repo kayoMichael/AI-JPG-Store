@@ -12,7 +12,7 @@ const redisClient = new Redis({
     const delay = Math.min(times * 50, 2000);
     return delay;
   },
-  maxRetriesPerRequest: 3,
+  maxRetriesPerRequest: 10,
 });
 
 redisClient.on('connect', () => {

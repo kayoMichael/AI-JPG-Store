@@ -55,6 +55,9 @@ const Images = () => {
           `/images/get?limit=24&page=${currentPage}&category=${capitalize(category!)}&sortBy=${sorting.sortBy}&order=${sorting.order}`
         )
         .then((res) => res.data);
+      console.log(
+        `/images/get?limit=24&page=${currentPage}&category=${capitalize(category!)}&sortBy=${sorting.sortBy}&order=${sorting.order}`
+      );
       setPagination(response.pagination);
       const images = response.images;
       const numberOfAuthors = new Set(
@@ -100,6 +103,12 @@ const Images = () => {
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= (pagination?.totalPages || 1)) {
       setCurrentPage(page);
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }, 50);
     }
   };
 
@@ -172,7 +181,7 @@ const Images = () => {
     } else if (option === 'newest') {
       setSorting({ sortBy: 'createdAt', order: 'desc' });
     } else if (option === 'alphabetical') {
-      setSorting({ sortBy: 'lexicographical', order: 'desc' });
+      setSorting({ sortBy: 'lexicographical', order: 'asc' });
     } else if (option === 'trending') {
       setSorting({ sortBy: 'likes', order: 'desc' });
     }

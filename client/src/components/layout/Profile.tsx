@@ -1,3 +1,4 @@
+import { Images, Settings, ImagePlus, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -22,7 +23,7 @@ const Profile = ({ user }: Props) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <Avatar className="h-9 w-9">
+          <Avatar className="h-9 w-9 hover:ring-1 hover:ring-purple-400">
             <AvatarImage
               src={user?.profileImage ?? '/default.webp'}
               alt="@Profile"
@@ -44,15 +45,31 @@ const Profile = ({ user }: Props) => {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <Link to={'/create'}>
-                <DropdownMenuItem>Create Image</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <ImagePlus />
+                  Create Image
+                </DropdownMenuItem>
               </Link>
               <Link to={'/account'}>
-                <DropdownMenuItem>Account</DropdownMenuItem>
+                <DropdownMenuItem>
+                  {' '}
+                  <Settings />
+                  Account
+                </DropdownMenuItem>
+              </Link>
+              <Link to={`/images/${user._id}/collection`}>
+                <DropdownMenuItem>
+                  <Images />
+                  My Images
+                </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <Link to={'/signout'}>
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem>
+                <LogOut />
+                Log out
+              </DropdownMenuItem>
             </Link>
           </>
         ) : (

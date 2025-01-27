@@ -7,6 +7,7 @@ import Categories from '../categories/Categories';
 import { CarouselCards } from './CarouselCards';
 import ImageCard from './ImageCard';
 
+import DashboardSkeleton from '@/components/skeleton/DashboardSkeleton';
 import useCategory from '@/context/CategoryContext';
 
 const Dashboard = () => {
@@ -21,7 +22,7 @@ const Dashboard = () => {
         categoryRef.scrollIntoView({ behavior: 'smooth' });
         window.history.replaceState({}, '', '/');
         setCategoryRef(null);
-      }, 100);
+      }, 200);
     }
   }, [categoryRef, setCategoryRef]);
 
@@ -40,7 +41,7 @@ const Dashboard = () => {
   });
 
   if (isLoading) {
-    return null;
+    return <DashboardSkeleton />;
   }
 
   return (

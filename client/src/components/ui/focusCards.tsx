@@ -36,8 +36,9 @@ export const Card = React.memo(
         <div className="w-full h-full relative">
           <Image
             src={card.url}
-            alt={card.title}
             className="absolute inset-0 w-full h-full object-cover"
+            priority={true}
+            loading="eager"
           />
         </div>
         <div
@@ -89,7 +90,7 @@ export const Card = React.memo(
 
 Card.displayName = 'Card';
 
-type Card = {
+export type Card = {
   title: string;
   url: string;
   category: string;

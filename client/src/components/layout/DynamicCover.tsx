@@ -81,8 +81,13 @@ const staticCover = {
 const DynamicCover = () => {
   const isRoot = useMatch('/');
   const isAllImages = useMatch('/images/all');
+  const { userId } = useParams<{ userId: string }>();
   const { category } = useParams<{ category: 'anime' | 'baroque' | 'space' | 'impressionism' }>();
-  return isRoot || isAllImages ? staticCover.root : category ? staticCover[category] : null;
+  return isRoot || isAllImages || userId
+    ? staticCover.root
+    : category
+      ? staticCover[category]
+      : null;
 };
 
 export default DynamicCover;

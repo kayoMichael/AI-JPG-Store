@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import axios from 'axios';
-import { Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Layout from './Layout';
 import AuthLayout from './components/layout/AuthLayout';
@@ -11,6 +12,7 @@ import AccountCreated from './pages/auth/AccountCreated';
 import Login from './pages/auth/Login';
 import Signout from './pages/auth/Signout';
 import SignUp from './pages/auth/Signup';
+import PersonalImages from './pages/collection/PersonalImage';
 import CreateImage from './pages/create/CreateImage';
 import ImageDetail from './pages/detail/ImageDetail';
 import Error from './pages/error/Error';
@@ -32,6 +34,10 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
   return (
     <QueryClientProvider client={queryClient}>
       <AuthLayout>
@@ -41,6 +47,7 @@ function App() {
             <Route path="/images/:category" element={<Images />} />
             <Route path="/images/all" element={<AllImages />} />
             <Route path="/images/:imageCategory/:imageId" element={<ImageDetail />} />
+            <Route path="/images/:userId/collection" element={<PersonalImages />} />
           </Route>
           <Route path="/create" element={<CreateImage />} />
           <Route path="/login" element={<Login />} />

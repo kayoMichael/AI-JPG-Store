@@ -22,7 +22,7 @@ const Image = ({
   src,
   width,
   height,
-  alt = 'Background of a beautiful view',
+  alt,
   loading = 'lazy',
   decoding = 'async',
   blurDataURL,

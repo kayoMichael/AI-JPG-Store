@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { Heart, Download } from 'lucide-react';
+import { Heart, ExternalLink } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -39,6 +39,11 @@ export default function ImageDetail() {
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
   const [open, setOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{
+    bio: string;
+    createdAt: string;
+    urls: { value: string }[];
+  }>();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
@@ -53,11 +58,17 @@ export default function ImageDetail() {
           .then((res) => res.data),
         axios.get(`/images/get/${imageId}`).then((res) => res.data),
       ]);
-
       const similarImages = response[0].images.filter(
         (image: { _id: string }) => image._id !== imageId
       );
       const targetImage = response[1];
+      const authorId = response[1].authorId._id;
+      try {
+        const currentUser = await axios.get(`/user/get/${authorId}`).then((res) => res.data._doc);
+        setCurrentUser(currentUser);
+      } catch {
+        setCurrentUser(undefined);
+      }
       setLiked(targetImage.liked);
       return { targetImage, similarImages };
     },
@@ -71,6 +82,15 @@ export default function ImageDetail() {
       navigate('/error');
     }
   });
+
+  const formatText = (text: string) => {
+    return text
+      ?.replace(/&apos;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>');
+  };
 
   const handleLike = async () => {
     if (!user) {
@@ -138,7 +158,11 @@ export default function ImageDetail() {
             <div className="flex items-center space-x-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-12 w-12 rounded-full">
+                  <Button
+                    variant="ghost"
+                    disabled={!currentUser}
+                    className="relative h-12 w-12 rounded-full hover:ring-1 hover:ring-purple-300"
+                  >
                     <Avatar className="h-12 w-12">
                       <AvatarImage
                         src={data?.targetImage.authorId.profileImage || '/default.webp'}
@@ -160,28 +184,43 @@ export default function ImageDetail() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <div className="p-2">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-lg font-semibold">1</p>
-                        <p className="text-xs text-muted-foreground">Total Liked Posts</p>
+                  <div className="space-y-4 p-2">
+                    {currentUser?.bio && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Bio</p>
+                        <ScrollArea className="h-24 w-full rounded-md border">
+                          <div className="p-2">
+                            <p className="text-sm">{formatText(currentUser?.bio)}</p>
+                          </div>
+                        </ScrollArea>
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-lg font-semibold">54</p>
-                        <p className="text-xs text-muted-foreground">Account Maturity</p>
-                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Joined</p>
+                      <p className="text-sm">
+                        {currentUser && new Date(currentUser.createdAt).toLocaleDateString()}
+                      </p>
                     </div>
-                    <DropdownMenuSeparator className="my-2" />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-lg font-semibold">12</p>
-                        <p className="text-xs text-muted-foreground">Total posts</p>
+
+                    {currentUser?.urls && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Links</p>
+                        <div className="space-y-1">
+                          {currentUser?.urls.map((link, idx) => (
+                            <Link
+                              key={idx}
+                              to={link.value}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center text-sm text-blue-500 hover:text-blue-600"
+                            >
+                              Bio Link {idx + 1}
+                              <ExternalLink className="ml-1 h-3 w-3" />
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-lg font-semibold">238</p>
-                        <p className="text-xs text-muted-foreground">Total likes</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -199,9 +238,6 @@ export default function ImageDetail() {
                 )}
               </Button>
               <span className="text-sm font-medium">{data?.targetImage.likes}</span>
-              <Button variant="outline" size="icon" disabled>
-                <Download className="h-4 w-4" />
-              </Button>
             </div>
           </div>
 
@@ -235,15 +271,15 @@ export default function ImageDetail() {
       </div>
       <div>
         <h3 className="text-2xl font-semibold mb-4">Similar Images</h3>
-        <FocusCards cards={data?.similarImages} type="category" />
+        <FocusCards cards={data?.similarImages || []} type="category" />
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Account Required!</DialogTitle>
             <DialogDescription>
-              Please sign in to like or download images. If you don&apos;t have an account, you can
-              create one for free.
+              Please sign in to like images. If you don&apos;t have an account, you can create one
+              for free.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

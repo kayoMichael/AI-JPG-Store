@@ -39,7 +39,7 @@ app.use('/auth', authRouter);
  * Base path: /users
  * @see {@link ./routes/user.routes.js}
  */
-app.use('/user', requireAuth, userRouter);
+app.use('/user', userRouter);
 
 /**
  * Image Routes

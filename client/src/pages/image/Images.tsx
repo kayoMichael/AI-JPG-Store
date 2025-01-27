@@ -55,9 +55,6 @@ const Images = () => {
           `/images/get?limit=24&page=${currentPage}&category=${capitalize(category!)}&sortBy=${sorting.sortBy}&order=${sorting.order}`
         )
         .then((res) => res.data);
-      console.log(
-        `/images/get?limit=24&page=${currentPage}&category=${capitalize(category!)}&sortBy=${sorting.sortBy}&order=${sorting.order}`
-      );
       setPagination(response.pagination);
       const images = response.images;
       const numberOfAuthors = new Set(

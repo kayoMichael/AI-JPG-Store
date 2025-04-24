@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
+import OpenAI from 'openai';
 
 import { env } from '../config/env.js';
 import { uploadToGCS } from '../config/storage.js';
@@ -13,7 +14,6 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { title, category, aiModel, description, visibility, image } =
       await RegisterImageSchema.parseAsync({ ...req.body, image: req.file });
-
     const userId = req.session.userId;
     const user = await UserModel.findById(userId);
     const safeFileName = `${Date.now()}-${image.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
@@ -265,5 +265,33 @@ export const deleteImage = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Image deleted successfully' });
   } catch {
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const generateImage = async (req: Request, res: Response) => {
+  const { prompt } = req.body;
+  try {
+    const client = new OpenAI();
+    const response = await client.images.generate({
+      model: 'dall-e-3',
+      prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard',
+      response_format: 'b64_json',
+    });
+
+    if (!response || !response.data || response.data.length === 0) {
+      res.status(500).json({ error: 'Failed to generate image' });
+      return;
+    }
+
+    res.status(200).json({
+      imageData: `data:image/png;base64,${response.data[0].b64_json}`,
+    });
+  } catch (error) {
+    console.error('Error generating image:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+    return;
   }
 };

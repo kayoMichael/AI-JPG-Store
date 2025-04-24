@@ -24,6 +24,7 @@ const envSchema = z.object({
   GCS_SERVICE_ACCOUNT: z.string(),
   GCS_PROJECT_ID: z.string(),
   GCS_BUCKET_NAME: z.string(),
+  OPENAI_API_KEY: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

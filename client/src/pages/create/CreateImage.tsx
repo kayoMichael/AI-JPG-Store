@@ -1,12 +1,22 @@
 import { ArrowLeft } from 'lucide-react';
 import { ClipboardList, Eye, EyeOff, Palette, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import ImageForm from './ImageForm';
 
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 const CreateImage = () => {
+  const user = useAuth((state) => state.user);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
   return (
     <div className="min-h-screen bg-white">
       <div className="flex gap-2 items-center px-4 sm:px-6 lg:px-8 mt-8">
@@ -38,7 +48,7 @@ const CreateImage = () => {
                     What is Generative AI?
                   </a>
                 </p>
-                <ImageForm />
+                <ImageForm userId={user!.id} />
               </div>
             </div>
 

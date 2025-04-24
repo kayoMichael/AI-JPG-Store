@@ -47,10 +47,10 @@ const MarkDown: FC<MarkDownProps> = ({ value, onChange }) => {
         </TabsContent>
       </Tabs>
 
-      <div className="text-sm text-gray-500">
+      {/* <div className="text-sm text-gray-500">
         Tip: You can format your text using markdown syntax. Use **bold**, *italic*, lists, and
         more.
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -98,7 +98,7 @@ jobs:
             GCS_SERVICE_ACCOUNT=${{ secrets.GCS_SERVICE_ACCOUNT }}, \
             GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}, \
             GCS_PROJECT_ID=${{ env.PROJECT_ID }}, \
-            OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}"
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}"
 
       - name: Get Server URL
         id: get-url

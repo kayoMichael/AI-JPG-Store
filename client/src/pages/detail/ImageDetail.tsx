@@ -227,7 +227,7 @@ export default function ImageDetail() {
                   variant="secondary"
                   className="cursor-pointer"
                   onClick={() => {
-                    navigate(`/images/${data?.targetImage.category}`);
+                    navigate(`/images/${data?.targetImage.category.toLowerCase()}`);
                   }}
                 >
                   {data?.targetImage.category}

@@ -37,10 +37,9 @@ export const usePagination = ({
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>(initialSort);
-  const [pagination, setPagination] = useState<PaginationState>();
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: [queryKey, currentPage, sorting],
+    queryKey: [queryKey, location.pathname, currentPage, sorting],
     queryFn: async () => {
       const params = new URLSearchParams({
         limit: itemsPerPage.toString(),
@@ -52,13 +51,17 @@ export const usePagination = ({
       if (userId) params.append('authorId', userId);
 
       const response = await axios.get(`${apiUrl}?${params.toString()}`).then((res) => res.data);
-      setPagination(response.pagination);
-      return response.images;
+      return {
+        images: response.images,
+        pagination: response.pagination,
+      };
     },
     staleTime: 1000 * 60 * 4,
     gcTime: 1000 * 60 * 7,
     refetchOnWindowFocus: false,
   });
+
+  const pagination = data?.pagination as PaginationState;
 
   useEffect(() => {
     if (isError) {
@@ -91,7 +94,7 @@ export const usePagination = ({
   };
 
   return {
-    data,
+    data: data?.images || [],
     isLoading,
     pagination,
     currentPage,

@@ -18,7 +18,7 @@ const PersonalImages = () => {
   );
 
   const { data, isLoading, pagination, handlePageChange, handleSortChange } = usePagination({
-    queryKey: 'trendingImages',
+    queryKey: 'personalImages',
     apiUrl: '/images/get',
     itemsPerPage: 24,
     userId: user?.id,

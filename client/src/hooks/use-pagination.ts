@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface PaginationState {
@@ -37,6 +37,12 @@ export const usePagination = ({
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>(initialSort);
+  const effectiveUserIdRef = useRef(userId);
+  useEffect(() => {
+    if (userId) {
+      effectiveUserIdRef.current = userId;
+    }
+  }, [userId]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [queryKey, location.pathname, currentPage, sorting],
@@ -46,9 +52,11 @@ export const usePagination = ({
         page: currentPage.toString(),
         sortBy: sorting.sortBy,
         order: sorting.order,
+        personal: (queryKey === 'Personal Images').toString(),
       });
       if (category) params.append('category', category);
-      if (userId) params.append('authorId', userId);
+      if (effectiveUserIdRef.current)
+        params.append('authorId', effectiveUserIdRef.current.toString());
 
       const response = await axios.get(`${apiUrl}?${params.toString()}`).then((res) => res.data);
       return {

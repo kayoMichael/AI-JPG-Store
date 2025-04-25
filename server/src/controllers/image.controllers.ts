@@ -94,6 +94,7 @@ export const getAllImages = async (req: Request, res: Response) => {
       sortBy = 'createdAt',
       order = 'desc',
       authorId,
+      personal = 'false',
     } = req.query;
 
     if (category) {
@@ -114,17 +115,34 @@ export const getAllImages = async (req: Request, res: Response) => {
     const pageNum = Math.max(1, parseInt(String(page)));
     const limitNum = Math.max(1, Math.min(100, parseInt(String(limit))));
     const skip = (pageNum - 1) * limitNum;
-
     const sortObject: Record<string, 1 | -1> = {};
     if (sortBy === 'lexicographical') {
       sortObject.title = order === 'asc' ? 1 : -1;
     } else if (sortBy === 'likes') {
       const pipeline: PipelineStage[] = [
+        ...(personal === 'false'
+          ? [
+              {
+                $match: {
+                  visibility: 'public',
+                },
+              },
+            ]
+          : []),
         ...(category
           ? [
               {
                 $match: {
                   category: category,
+                },
+              },
+            ]
+          : []),
+        ...(authorId
+          ? [
+              {
+                $match: {
+                  authorId: new mongoose.Types.ObjectId(authorId.toString()),
                 },
               },
             ]
@@ -168,10 +186,16 @@ export const getAllImages = async (req: Request, res: Response) => {
         { $skip: skip },
         { $limit: limitNum },
       ];
-      const [images, totalCount] = await Promise.all([
+      const countPipeline = pipeline.filter(
+        (stage) => !Object.keys(stage).includes('$skip') && !Object.keys(stage).includes('$limit')
+      );
+      countPipeline.push({ $count: 'total' });
+
+      const [images, countResult] = await Promise.all([
         ImageModel.aggregate(pipeline),
-        ImageModel.countDocuments(),
+        ImageModel.aggregate(countPipeline),
       ]);
+      const totalCount = countResult.length > 0 ? countResult[0].total : 0;
 
       res.status(200).json({
         images,
@@ -201,6 +225,9 @@ export const getAllImages = async (req: Request, res: Response) => {
     }
     if (authorId) {
       queryObject.authorId = String(authorId);
+    }
+    if (personal === 'false') {
+      queryObject.visibility = 'public';
     }
 
     const [images, totalCount] = await Promise.all([

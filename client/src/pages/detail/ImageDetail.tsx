@@ -142,13 +142,11 @@ export default function ImageDetail() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       <div className="grid lg:grid-cols-2 gap-8">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+        <div className="overflow-hidden rounded-lg w-full flex justify-center">
           <Image
             src={data?.targetImage.url}
-            fill
             alt="Image"
-            objectFit="cover"
-            className="transition-transform duration-300 hover:scale-105"
+            className="transition-transform duration-300 hover:scale-105 w-auto object-contain"
           />
         </div>
         <div className="space-y-6 aspect-[4/3] lg:aspect-[3/2]">
@@ -225,7 +223,15 @@ export default function ImageDetail() {
               </DropdownMenu>
               <div>
                 <h2 className="text-xl font-semibold">{data?.targetImage.authorId.name}</h2>
-                <Badge variant="secondary">{data?.targetImage.category}</Badge>
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    navigate(`/images/${data?.targetImage.category}`);
+                  }}
+                >
+                  {data?.targetImage.category}
+                </Badge>
               </div>
             </div>
             <div className="flex items-center space-x-2">

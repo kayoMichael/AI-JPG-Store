@@ -29,17 +29,12 @@ export const Card = React.memo(
         onMouseLeave={() => setHovered(null)}
         onClick={() => navigate(`/images/${card.category}/${card._id}`)}
         className={cn(
-          'rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-80 w-full transition-all duration-300 ease-out',
+          'rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-80 w-full transition-all duration-300 ease-out cursor-pointer',
           hovered !== null && hovered !== index && 'blur-sm scale-[0.98]'
         )}
       >
         <div className="w-full h-full relative">
-          <Image
-            src={card.url}
-            className="absolute inset-0 w-full h-full object-cover"
-            priority={true}
-            loading="eager"
-          />
+          <Image src={card.url} className="mx-auto" priority={true} loading="eager" />
         </div>
         <div
           className={cn(

@@ -268,7 +268,7 @@ const ImageForm = ({ userId }: { userId: string }) => {
                 </DialogTitle>
                 <DialogDescription className="pt-2">
                   Are you happy with the image? It cannot be changed after posting unless explicitly
-                  deleted.
+                  deleted. (You can always edit the title, description, and category.)
                 </DialogDescription>
               </DialogHeader>
 
@@ -306,7 +306,7 @@ const ImageForm = ({ userId }: { userId: string }) => {
                 >
                   {loading ? (
                     <>
-                      <Spinner className="w-4 h-4 mr-2" />
+                      <Spinner className="w-4 h-4 mr-2 fill-purple-400" />
                       Creating...
                     </>
                   ) : (

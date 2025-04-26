@@ -5,8 +5,8 @@ env:
   REGION: northamerica-northeast2
   CLIENT_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/client
   SERVER_IMAGE: northamerica-northeast2-docker.pkg.dev/mern-stack-app-447200/image-store/server
-  PROD_CLIENT_URL: https://AI-img-store-979936343537.northamerica-northeast2.run.app
-  PROD_SERVER_URL: https://AI-img-server-979936343537.northamerica-northeast2.run.app
+  PROD_CLIENT_URL: https://ai-img-store-979936343537.northamerica-northeast2.run.app
+  PROD_SERVER_URL: https://ai-img-server-979936343537.northamerica-northeast2.run.app
 
 on:
   push:
@@ -28,12 +28,12 @@ jobs:
         id: set-names
         run: |
           if [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            echo "client_service=AI-img-store-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
-            echo "server_service=AI-img-server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "client_service=ai-img-store-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
+            echo "server_service=ai-img-server-pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
             echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
           else
-            echo "client_service=AI-img-store" >> $GITHUB_OUTPUT
-            echo "server_service=AI-img-server" >> $GITHUB_OUTPUT
+            echo "client_service=ai-img-store" >> $GITHUB_OUTPUT
+            echo "server_service=ai-img-server" >> $GITHUB_OUTPUT
             echo "image_tag=latest" >> $GITHUB_OUTPUT
           fi
 

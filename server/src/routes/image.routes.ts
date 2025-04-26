@@ -6,6 +6,7 @@ import {
   getAllImages,
   deleteImage,
   register,
+  generateImage,
 } from '../controllers/image.controllers.js';
 import requireAuth from '../middleware/auth.js';
 
@@ -15,5 +16,6 @@ router.post('/create', requireAuth, upload.single('image'), register);
 router.get('/get/:imageId', getImagesById);
 router.delete('/delete/:imageId', requireAuth, deleteImage);
 router.get('/get', getAllImages);
+router.post('/generate', requireAuth, generateImage);
 
 export default router;

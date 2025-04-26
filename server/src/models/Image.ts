@@ -73,6 +73,7 @@ ImageSchema.index({ category: 1, createdAt: 1 }, { background: true });
 ImageSchema.index({ authorId: 1, createdAt: 1 }, { background: true });
 ImageSchema.index({ name: 1 }, { background: true });
 ImageSchema.index({ authorId: 1 }, { background: true });
+ImageSchema.index({ visibility: 1, category: 1 }, { background: true });
 
 const ImageModel = mongoose.model('Image', ImageSchema);
 

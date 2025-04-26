@@ -11,7 +11,7 @@ const Trending = () => {
   );
 
   const { data, isLoading, pagination, handlePageChange, handleSortChange } = usePagination({
-    queryKey: 'trendingImages',
+    queryKey: 'trending Images',
     apiUrl: '/images/get',
     itemsPerPage: 24,
   });

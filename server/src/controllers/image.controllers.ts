@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
+import OpenAI from 'openai';
 
 import { env } from '../config/env.js';
 import { uploadToGCS } from '../config/storage.js';
@@ -13,7 +14,6 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { title, category, aiModel, description, visibility, image } =
       await RegisterImageSchema.parseAsync({ ...req.body, image: req.file });
-
     const userId = req.session.userId;
     const user = await UserModel.findById(userId);
     const safeFileName = `${Date.now()}-${image.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
@@ -94,6 +94,7 @@ export const getAllImages = async (req: Request, res: Response) => {
       sortBy = 'createdAt',
       order = 'desc',
       authorId,
+      personal = 'false',
     } = req.query;
 
     if (category) {
@@ -114,17 +115,34 @@ export const getAllImages = async (req: Request, res: Response) => {
     const pageNum = Math.max(1, parseInt(String(page)));
     const limitNum = Math.max(1, Math.min(100, parseInt(String(limit))));
     const skip = (pageNum - 1) * limitNum;
-
     const sortObject: Record<string, 1 | -1> = {};
     if (sortBy === 'lexicographical') {
       sortObject.title = order === 'asc' ? 1 : -1;
     } else if (sortBy === 'likes') {
       const pipeline: PipelineStage[] = [
+        ...(personal === 'false'
+          ? [
+              {
+                $match: {
+                  visibility: 'public',
+                },
+              },
+            ]
+          : []),
         ...(category
           ? [
               {
                 $match: {
                   category: category,
+                },
+              },
+            ]
+          : []),
+        ...(authorId
+          ? [
+              {
+                $match: {
+                  authorId: new mongoose.Types.ObjectId(authorId.toString()),
                 },
               },
             ]
@@ -168,10 +186,16 @@ export const getAllImages = async (req: Request, res: Response) => {
         { $skip: skip },
         { $limit: limitNum },
       ];
-      const [images, totalCount] = await Promise.all([
+      const countPipeline = pipeline.filter(
+        (stage) => !Object.keys(stage).includes('$skip') && !Object.keys(stage).includes('$limit')
+      );
+      countPipeline.push({ $count: 'total' });
+
+      const [images, countResult] = await Promise.all([
         ImageModel.aggregate(pipeline),
-        ImageModel.countDocuments(),
+        ImageModel.aggregate(countPipeline),
       ]);
+      const totalCount = countResult.length > 0 ? countResult[0].total : 0;
 
       res.status(200).json({
         images,
@@ -201,6 +225,9 @@ export const getAllImages = async (req: Request, res: Response) => {
     }
     if (authorId) {
       queryObject.authorId = String(authorId);
+    }
+    if (personal === 'false') {
+      queryObject.visibility = 'public';
     }
 
     const [images, totalCount] = await Promise.all([
@@ -265,5 +292,33 @@ export const deleteImage = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Image deleted successfully' });
   } catch {
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const generateImage = async (req: Request, res: Response) => {
+  const { prompt } = req.body;
+  try {
+    const client = new OpenAI();
+    const response = await client.images.generate({
+      model: 'dall-e-3',
+      prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard',
+      response_format: 'b64_json',
+    });
+
+    if (!response || !response.data || response.data.length === 0) {
+      res.status(500).json({ error: 'Failed to generate image' });
+      return;
+    }
+
+    res.status(200).json({
+      imageData: `data:image/png;base64,${response.data[0].b64_json}`,
+    });
+  } catch (error) {
+    console.error('Error generating image:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+    return;
   }
 };

@@ -1,19 +1,28 @@
 import { ArrowLeft } from 'lucide-react';
 import { ClipboardList, Eye, EyeOff, Palette, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import ImageForm from './ImageForm';
 
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 const CreateImage = () => {
+  const user = useAuth((state) => state.user);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
   return (
     <div className="min-h-screen bg-white">
       <div className="flex gap-2 items-center px-4 sm:px-6 lg:px-8 mt-8">
         <Button className="rounded-full h-10 w-10 p-2 bg-gray-300" variant="ghost">
-          <Link to={'/'}>
+          <button onClick={() => navigate(-1)}>
             <ArrowLeft />
-          </Link>
+          </button>
         </Button>
         <div className="font-sans font-bold">Back To Dashboard</div>
       </div>
@@ -38,7 +47,7 @@ const CreateImage = () => {
                     What is Generative AI?
                   </a>
                 </p>
-                <ImageForm />
+                <ImageForm userId={user!.id} />
               </div>
             </div>
 

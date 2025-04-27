@@ -45,7 +45,6 @@ const Images = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Convert sorting state to SortOption for the SortingControls component
   const getSortOption = (): SortOption => {
     const { sortBy, order } = sorting;
 
@@ -55,7 +54,7 @@ const Images = () => {
     if (sortBy === 'lexicographical' && order === 'desc') return 'reverseAlphabetical';
     if (sortBy === 'likes' && order === 'desc') return 'trending';
 
-    return 'newest'; // Default
+    return 'newest';
   };
 
   useEffect(() => {
@@ -70,7 +69,6 @@ const Images = () => {
     const sort = params.get('sortBy');
     const order = params.get('order');
 
-    // Handle page parameter
     if (page && /^\d+$/.test(page)) {
       setCurrentPage(Number(page));
     } else {
@@ -84,8 +82,6 @@ const Images = () => {
         { replace: true }
       );
     }
-
-    // Handle sort parameter
     if (sort === 'lexicographical' || sort === 'createdAt' || sort === 'likes') {
       setSorting((prev) => ({
         ...prev,
@@ -105,8 +101,6 @@ const Images = () => {
         { replace: true }
       );
     }
-
-    // Handle order parameter
     if (order === 'asc' || order === 'desc') {
       setSorting((prev) => ({
         ...prev,
@@ -160,29 +154,11 @@ const Images = () => {
     }
   }, [isError, navigate]);
 
-  if (isLoading) {
-    return (
-      <>
-        <DynamicCover />
-        <div className="mt-96"></div>
-        <AllImagesSkeleton activeSort={getSortOption()} onSortChange={handleSortChange} />
-      </>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-[500px]">
-        <p className="text-white">No images found for this category.</p>
-      </div>
-    );
-  }
-
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= (pagination?.totalPages || 1)) {
       const params = new URLSearchParams(location.search);
       params.set('page', page.toString());
-
+      setCurrentPage(page);
       navigate(
         {
           pathname: location.pathname,
@@ -201,36 +177,30 @@ const Images = () => {
   };
 
   const renderPaginationItems = () => {
-    if (!pagination || pagination.totalPages === 1) return null;
+    if (!pagination || pagination.totalPages <= 1) return null;
 
     const items = [];
-
+    const { currentPage, totalPages, hasPrevPage, hasNextPage } = pagination;
     items.push(
       <PaginationItem key="prev" className="cursor-pointer">
         <PaginationPrevious
           onClick={() => handlePageChange(currentPage - 1)}
-          className={!pagination.hasPrevPage ? 'pointer-events-none opacity-50' : ''}
+          className={!hasPrevPage ? 'pointer-events-none opacity-50' : ''}
         />
       </PaginationItem>
     );
-
-    items.push(
-      <PaginationItem key={1}>
-        <PaginationLink onClick={() => handlePageChange(1)} isActive={pagination.currentPage === 1}>
-          1
+    const createPageItem = (pageNum: number) => (
+      <PaginationItem key={pageNum} className="cursor-pointer">
+        <PaginationLink
+          onClick={() => handlePageChange(pageNum)}
+          isActive={currentPage === pageNum}
+        >
+          {pageNum}
         </PaginationLink>
       </PaginationItem>
     );
-
-    if (pagination.currentPage !== 1 && pagination.currentPage !== pagination.totalPages) {
-      items.push(
-        <PaginationItem key={pagination.currentPage}>
-          <PaginationLink isActive>{pagination.currentPage}</PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (pagination.currentPage < pagination.totalPages - 2) {
+    items.push(createPageItem(1));
+    if (currentPage > 3) {
       items.push(
         <PaginationItem key="ellipsis-1">
           <PaginationEllipsis />
@@ -238,26 +208,34 @@ const Images = () => {
       );
     }
 
-    if (pagination.totalPages > 1) {
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
+      if (i === 1 || i === totalPages) continue;
+      items.push(createPageItem(i));
+    }
+    if (currentPage < totalPages - 2) {
       items.push(
-        <PaginationItem key={pagination.totalPages}>
-          <PaginationLink
-            onClick={() => handlePageChange(pagination.totalPages)}
-            isActive={pagination.currentPage === pagination.totalPages}
-          >
-            {pagination.totalPages}
-          </PaginationLink>
+        <PaginationItem key="ellipsis-2">
+          <PaginationEllipsis />
         </PaginationItem>
       );
     }
 
-    if (pagination.hasNextPage) {
-      items.push(
-        <PaginationItem key="next" className="cursor-pointer">
-          <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
-        </PaginationItem>
-      );
+    if (totalPages > 1) {
+      items.push(createPageItem(totalPages));
     }
+
+    items.push(
+      <PaginationItem key="next" className="cursor-pointer">
+        <PaginationNext
+          onClick={() => handlePageChange(currentPage + 1)}
+          className={!hasNextPage ? 'pointer-events-none opacity-50' : ''}
+        />
+      </PaginationItem>
+    );
 
     return items;
   };
@@ -290,6 +268,24 @@ const Images = () => {
         search: params.toString(),
       },
       { replace: true }
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <>
+        <DynamicCover />
+        <div className="mt-96"></div>
+        <AllImagesSkeleton activeSort={getSortOption()} onSortChange={handleSortChange} />
+      </>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <p className="text-white">No images found for this category.</p>
+      </div>
     );
   }
 

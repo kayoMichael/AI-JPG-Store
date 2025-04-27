@@ -157,7 +157,16 @@ export const usePagination = ({
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= (pagination?.totalPages || 1)) {
+      const params = new URLSearchParams(location.search);
+      params.set('page', page.toString());
       setCurrentPage(page);
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -181,7 +190,7 @@ export const usePagination = ({
     } else if (option === 'trending') {
       newSorting = { sortBy: 'likes', order: 'desc' };
     } else {
-      newSorting = { sortBy: 'createdAt', order: 'desc' }; // Default case
+      newSorting = { sortBy: 'createdAt', order: 'desc' };
     }
     setSorting(newSorting);
 

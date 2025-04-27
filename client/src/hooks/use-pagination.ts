@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 interface PaginationState {
   currentPage: number;
@@ -38,13 +39,14 @@ export const usePagination = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>(initialSort);
   const effectiveUserIdRef = useRef(userId);
+  const location = useLocation();
   useEffect(() => {
     if (userId) {
       effectiveUserIdRef.current = userId;
     }
   }, [userId]);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: [queryKey, location.pathname, currentPage, sorting],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -68,6 +70,21 @@ export const usePagination = ({
     gcTime: 1000 * 60 * 7,
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.has('refetch')) {
+      refetch();
+      params.delete('refetch');
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+  }, [location.search, location.pathname, navigate, refetch]);
 
   const pagination = data?.pagination as PaginationState;
 

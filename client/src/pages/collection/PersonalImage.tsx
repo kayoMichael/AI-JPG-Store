@@ -1,18 +1,41 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { PaginatedContent } from '@/components/layout/PaginatedContent';
 import { FocusCards, Card } from '@/components/ui/focusCards';
 import { useAuth } from '@/context/AuthContext';
 import { usePagination } from '@/hooks/use-pagination';
+import { useToast } from '@/hooks/use-toast';
 const PersonalImages = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const { toast } = useToast();
   const navigate = useNavigate();
   useEffect(() => {
     if (!user) {
       navigate('/');
     }
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.has('toast')) {
+      toast({
+        title: 'Image Deleted',
+        description: 'Your image has been deleted successfully.',
+        variant: 'default',
+      });
+      params.delete('toast');
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+  }, [location.search, location.pathname, toast, navigate]);
+
   const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
     'newest'
   );

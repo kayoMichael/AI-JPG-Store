@@ -118,7 +118,7 @@ export default function ImageDetail() {
         <div className="space-y-6 aspect-[4/3] lg:aspect-[3/2]">
           {!editing && <h1 className="text-3xl font-bold">{data?.targetImage.title}</h1>}
           {editing ? (
-            <DetailEdit image={data!.targetImage} handleSwitch={handleSwitch} />
+            <DetailEdit image={data!.targetImage} handleSwitch={handleSwitch} userId={user?.id} />
           ) : (
             <DetailView
               setOpen={setOpen}

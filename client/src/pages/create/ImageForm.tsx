@@ -120,7 +120,7 @@ const ImageForm = ({ userId }: { userId: string }) => {
       navigate('/error');
     }
     setLoading(false);
-    navigate(`/images/${userId}/collection`);
+    navigate(`/images/${userId}/collection?refetch=true`);
   };
 
   const handleModelSelect = (modelId: number) => {

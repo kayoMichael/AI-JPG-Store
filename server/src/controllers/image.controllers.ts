@@ -10,6 +10,7 @@ import ImageModel, {
   IPopulatedImage,
   UpdateImageSchema,
 } from '../models/Image.js';
+import LikeModel from '../models/Likes.js';
 import UserModel from '../models/User.js';
 import { getEnumValue } from '../utils/enum.js';
 
@@ -318,6 +319,7 @@ export const deleteImage = async (req: Request, res: Response) => {
   const { imageId } = req.params;
   try {
     const image = await ImageModel.findByIdAndDelete(imageId);
+    await LikeModel.deleteMany({ imageId });
     if (!image) {
       res.status(404).json({ error: 'Image not found' });
       return;

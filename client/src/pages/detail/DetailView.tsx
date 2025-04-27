@@ -44,7 +44,7 @@ interface Props {
     targetImage: IImage;
     similarImages: IImage[];
   };
-  setEditing: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSwitch: (update?: boolean) => void;
 }
 
 const DetailView = ({
@@ -55,7 +55,7 @@ const DetailView = ({
   setLiked,
   currentUser,
   personalConfig,
-  setEditing,
+  handleSwitch,
   data,
 }: Props) => {
   const { toast } = useToast();
@@ -123,7 +123,6 @@ const DetailView = ({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                disabled={!currentUser}
                 className="relative h-12 w-12 rounded-full hover:ring-1 hover:ring-purple-300"
               >
                 <Avatar className="h-12 w-12">
@@ -247,7 +246,7 @@ const DetailView = ({
       <div className="flex items-center">
         <div className="flex-grow flex justify-end">
           {personalConfig.edit && (
-            <Button onClick={() => setEditing(true)}>
+            <Button onClick={() => handleSwitch()}>
               <Edit />
               <div>Edit</div>
             </Button>

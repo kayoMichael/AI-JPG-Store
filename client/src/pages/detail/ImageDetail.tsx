@@ -28,7 +28,6 @@ export default function ImageDetail() {
   const [liked, setLiked] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
-  console.log(editing);
   const [personalConfig, setPersonalConfig] = useState({
     edit: false,
     visibility: 'public',
@@ -44,7 +43,7 @@ export default function ImageDetail() {
   }, [pathname]);
   const navigate = useNavigate();
   const { imageId, imageCategory } = useParams();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['imageDetail', imageId],
     queryFn: async () => {
       const response = await Promise.all([
@@ -70,8 +69,8 @@ export default function ImageDetail() {
         similarImages: IImage[];
       };
     },
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
   });
 
@@ -97,6 +96,14 @@ export default function ImageDetail() {
     }
   });
 
+  const handleSwitch = (update?: boolean) => {
+    if (update) {
+      refetch();
+    }
+    window.scrollTo(0, 0);
+    setEditing(!editing);
+  };
+
   if (isLoading) return <DetailSkeleton />;
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -111,11 +118,7 @@ export default function ImageDetail() {
         <div className="space-y-6 aspect-[4/3] lg:aspect-[3/2]">
           {!editing && <h1 className="text-3xl font-bold">{data?.targetImage.title}</h1>}
           {editing ? (
-            <DetailEdit
-              image={data!.targetImage}
-              setEditing={setEditing}
-              personalConfig={personalConfig}
-            />
+            <DetailEdit image={data!.targetImage} handleSwitch={handleSwitch} />
           ) : (
             <DetailView
               setOpen={setOpen}
@@ -125,7 +128,7 @@ export default function ImageDetail() {
               currentUser={currentUser}
               personalConfig={personalConfig}
               data={data!}
-              setEditing={setEditing}
+              handleSwitch={handleSwitch}
             />
           )}
         </div>

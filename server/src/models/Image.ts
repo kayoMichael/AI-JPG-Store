@@ -70,10 +70,9 @@ export const RegisterImageSchema = z.object({
 });
 
 export const UpdateImageSchema = z.object({
-  imageId: z.string(),
   title: z.string().optional(),
   category: z.nativeEnum(Category).optional(),
-  aiModel: z.string().optional(),
+  aiModel: z.number().optional(),
   description: z.string().optional(),
   visibility: z.nativeEnum(Visibility).optional(),
 });

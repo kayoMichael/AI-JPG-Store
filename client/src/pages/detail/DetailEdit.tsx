@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Save } from 'lucide-react';
+import axios from 'axios';
+import { OctagonX, Save } from 'lucide-react';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
+import Spinner from '@/components/common/Spinner';
 import MarkDown from '@/components/layout/Markdown';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { AiModels } from '@/constant/AiModels';
+import { useToast } from '@/hooks/use-toast';
 import { IImage } from '@/types/image';
 import { cn } from '@/utils/merge';
 
@@ -49,17 +51,13 @@ export type FormValues = z.infer<typeof formSchema>;
 
 interface Props {
   image: IImage;
-  personalConfig: {
-    edit: boolean;
-    visibility: string;
-  };
-  setEditing: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSwitch: (update?: boolean) => void;
 }
 
-const DetailEdit = ({ image, setEditing, personalConfig }: Props) => {
+const DetailEdit = ({ image, handleSwitch }: Props) => {
   const [visibility, setVisibility] = useState(image.visibility === 'public');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -79,15 +77,27 @@ const DetailEdit = ({ image, setEditing, personalConfig }: Props) => {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('title', data.title);
-      formData.append('category', data.category);
-      formData.append('description', data.description);
-      formData.append('aiModel', String(data.aiModel));
-      formData.append('visibility', visibility ? 'public' : 'private');
+      await axios.patch(`/images/update/${image._id}`, {
+        ...data,
+        visibility: visibility ? 'public' : 'private',
+      });
+      toast({
+        title: 'Updated Successfully!',
+        description: (
+          <div className="flex items-center gap-2">
+            {data.title} has been updated successfully on {new Date().toLocaleDateString()}
+          </div>
+        ),
+      });
+      handleSwitch(true);
     } catch {
       setLoading(false);
-      navigate('/error');
+      toast({
+        variant: 'destructive',
+        title: 'Something Went Wrong!',
+        description: 'Failed to update image. Please try again.',
+      });
+      handleSwitch();
     }
     setLoading(false);
   };
@@ -190,15 +200,28 @@ const DetailEdit = ({ image, setEditing, personalConfig }: Props) => {
           )}
         />
       </div>
-      <div className="flex items-center">
-        <div className="flex-grow flex justify-end">
-          {personalConfig.edit && (
-            <Button onClick={() => setEditing(false)} disabled={loading}>
-              <Save />
-              <div>Save</div>
-            </Button>
-          )}
+      <div className="flex items-center justify-between">
+        <div className="flex justify-center gap-4">
+          <Button disabled={loading} type="submit">
+            {loading ? (
+              <>
+                <Spinner /> <div>Saving...</div>
+              </>
+            ) : (
+              <>
+                <Save />
+                <div>Save</div>
+              </>
+            )}
+          </Button>
+          <Button variant="destructive" onClick={() => handleSwitch()} type="button">
+            <OctagonX />
+            <div>Delete</div>
+          </Button>
         </div>
+        <Button variant="outline" onClick={() => handleSwitch()} type="button">
+          <div>Cancel</div>
+        </Button>
       </div>
     </form>
   );

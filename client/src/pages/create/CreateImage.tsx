@@ -19,10 +19,12 @@ const CreateImage = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="flex gap-2 items-center px-4 sm:px-6 lg:px-8 mt-8">
-        <Button className="rounded-full h-10 w-10 p-2 bg-gray-300" variant="ghost">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft />
-          </button>
+        <Button
+          className="rounded-full h-10 w-10 p-2 bg-gray-300"
+          variant="ghost"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft />
         </Button>
         <div className="font-sans font-bold">Back To Dashboard</div>
       </div>

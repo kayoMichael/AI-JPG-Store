@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+import { SortOption } from '@/components/layout/FeatureButton';
 import { PaginatedContent } from '@/components/layout/PaginatedContent';
 import { FocusCards, Card } from '@/components/ui/focusCards';
 import { useAuth } from '@/context/AuthContext';
@@ -20,11 +21,20 @@ const PersonalImages = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.has('toast')) {
-      toast({
-        title: 'Image Deleted',
-        description: 'Your image has been deleted successfully.',
-        variant: 'default',
-      });
+      const toastType = params.get('toast');
+      if (toastType === 'delete') {
+        toast({
+          title: 'Image Deleted',
+          description: 'Your image has been deleted successfully.',
+          variant: 'default',
+        });
+      } else if (toastType === 'create') {
+        toast({
+          title: 'Image Created',
+          description: 'Your image has been created successfully.',
+          variant: 'default',
+        });
+      }
       params.delete('toast');
       navigate(
         {
@@ -36,9 +46,7 @@ const PersonalImages = () => {
     }
   }, [location.search, location.pathname, toast, navigate]);
 
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
-    'newest'
-  );
+  const [activeSort, setActiveSort] = useState<SortOption>('newest');
 
   const { data, isLoading, pagination, handlePageChange, handleSortChange } = usePagination({
     queryKey: 'Personal Images',
@@ -47,7 +55,7 @@ const PersonalImages = () => {
     userId: user?.id,
   });
 
-  const handleSort = (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => {
+  const handleSort = (option: SortOption) => {
     setActiveSort(option);
     handleSortChange(option);
   };

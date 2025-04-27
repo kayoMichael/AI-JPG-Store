@@ -1,14 +1,13 @@
 import { useState } from 'react';
 
+import { SortOption } from '@/components/layout/FeatureButton';
 import { PaginatedContent } from '@/components/layout/PaginatedContent';
 import { FocusCards } from '@/components/ui/focusCards';
 import { Card } from '@/components/ui/focusCards';
 import { usePagination } from '@/hooks/use-pagination';
 
 const Trending = () => {
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
-    'newest'
-  );
+  const [activeSort, setActiveSort] = useState<SortOption>('newest');
 
   const { data, isLoading, pagination, handlePageChange, handleSortChange } = usePagination({
     queryKey: 'trending Images',
@@ -16,7 +15,7 @@ const Trending = () => {
     itemsPerPage: 24,
   });
 
-  const handleSort = (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => {
+  const handleSort = (option: SortOption) => {
     setActiveSort(option);
     handleSortChange(option);
   };

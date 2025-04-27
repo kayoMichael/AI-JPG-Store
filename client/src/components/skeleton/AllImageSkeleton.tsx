@@ -1,9 +1,9 @@
-import SortingControls from '@/components/layout/FeatureButton';
+import SortingControls, { SortOption } from '@/components/layout/FeatureButton';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AllImagesSkeletonProps {
-  activeSort: 'newest' | 'oldest' | 'alphabetical' | 'trending';
-  onSortChange: (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => void;
+  activeSort: SortOption;
+  onSortChange: (option: SortOption) => void;
 }
 
 const AllImagesSkeleton = ({ activeSort, onSortChange }: AllImagesSkeletonProps) => {

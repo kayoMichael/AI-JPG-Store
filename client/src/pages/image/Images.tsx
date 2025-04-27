@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import Footer from '@/components/common/Footer';
 import DynamicCover from '@/components/layout/DynamicCover';
 import SortingControls from '@/components/layout/FeatureButton';
+import { SortOption } from '@/components/layout/FeatureButton';
 import AllImagesSkeleton from '@/components/skeleton/AllImageSkeleton';
 import { FocusCards } from '@/components/ui/focusCards';
 import {
@@ -19,15 +20,17 @@ import {
 } from '@/components/ui/pagination';
 import { capitalize } from '@/utils/capitalise';
 
+interface SortingState {
+  sortBy: string;
+  order: string;
+}
+
 const Images = () => {
   const { category } = useParams<{ category: string }>();
   const [uniqueAuthors, setUniqueAuthors] = useState<number>(0);
   const [totalLikes, setTotalLikes] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
-    'newest'
-  );
-  const [sorting, setSorting] = useState<{ sortBy: string; order: string }>({
+  const [sorting, setSorting] = useState<SortingState>({
     sortBy: 'createdAt',
     order: 'desc',
   });
@@ -40,6 +43,20 @@ const Images = () => {
     hasPrevPage: boolean;
   }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Convert sorting state to SortOption for the SortingControls component
+  const getSortOption = (): SortOption => {
+    const { sortBy, order } = sorting;
+
+    if (sortBy === 'createdAt' && order === 'desc') return 'newest';
+    if (sortBy === 'createdAt' && order === 'asc') return 'oldest';
+    if (sortBy === 'lexicographical' && order === 'asc') return 'alphabetical';
+    if (sortBy === 'lexicographical' && order === 'desc') return 'reverseAlphabetical';
+    if (sortBy === 'likes' && order === 'desc') return 'trending';
+
+    return 'newest'; // Default
+  };
 
   useEffect(() => {
     if (!category) {
@@ -47,8 +64,72 @@ const Images = () => {
     }
   }, [category, navigate]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const page = params.get('page');
+    const sort = params.get('sortBy');
+    const order = params.get('order');
+
+    // Handle page parameter
+    if (page && /^\d+$/.test(page)) {
+      setCurrentPage(Number(page));
+    } else {
+      setCurrentPage(1);
+      params.set('page', '1');
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+
+    // Handle sort parameter
+    if (sort === 'lexicographical' || sort === 'createdAt' || sort === 'likes') {
+      setSorting((prev) => ({
+        ...prev,
+        sortBy: sort,
+      }));
+    } else {
+      params.set('sortBy', 'createdAt');
+      setSorting((prev) => ({
+        ...prev,
+        sortBy: 'createdAt',
+      }));
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+
+    // Handle order parameter
+    if (order === 'asc' || order === 'desc') {
+      setSorting((prev) => ({
+        ...prev,
+        order,
+      }));
+    } else {
+      params.set('order', 'desc');
+      setSorting((prev) => ({
+        ...prev,
+        order: 'desc',
+      }));
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+  }, [location.search, location.pathname, navigate]);
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['categoryImages', currentPage, sorting],
+    queryKey: ['categoryImages', category, currentPage, sorting],
     queryFn: async () => {
       const response = await axios
         .get(
@@ -68,8 +149,8 @@ const Images = () => {
       setTotalLikes(totalLikes);
       return images;
     },
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 60 * 4,
+    gcTime: 1000 * 60 * 7,
     refetchOnWindowFocus: false,
   });
 
@@ -84,7 +165,7 @@ const Images = () => {
       <>
         <DynamicCover />
         <div className="mt-96"></div>
-        <AllImagesSkeleton activeSort={activeSort} onSortChange={handleSortChange} />
+        <AllImagesSkeleton activeSort={getSortOption()} onSortChange={handleSortChange} />
       </>
     );
   }
@@ -99,7 +180,17 @@ const Images = () => {
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= (pagination?.totalPages || 1)) {
-      setCurrentPage(page);
+      const params = new URLSearchParams(location.search);
+      params.set('page', page.toString());
+
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -171,17 +262,35 @@ const Images = () => {
     return items;
   };
 
-  function handleSortChange(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') {
-    setActiveSort(option);
+  function handleSortChange(option: SortOption) {
+    let newSorting: SortingState;
+
     if (option === 'oldest') {
-      setSorting({ sortBy: 'createdAt', order: 'asc' });
+      newSorting = { sortBy: 'createdAt', order: 'asc' };
     } else if (option === 'newest') {
-      setSorting({ sortBy: 'createdAt', order: 'desc' });
+      newSorting = { sortBy: 'createdAt', order: 'desc' };
     } else if (option === 'alphabetical') {
-      setSorting({ sortBy: 'lexicographical', order: 'asc' });
+      newSorting = { sortBy: 'lexicographical', order: 'asc' };
+    } else if (option === 'reverseAlphabetical') {
+      newSorting = { sortBy: 'lexicographical', order: 'desc' };
     } else if (option === 'trending') {
-      setSorting({ sortBy: 'likes', order: 'desc' });
+      newSorting = { sortBy: 'likes', order: 'desc' };
+    } else {
+      newSorting = { sortBy: 'createdAt', order: 'desc' };
     }
+
+    const params = new URLSearchParams(location.search);
+    params.set('sortBy', newSorting.sortBy);
+    params.set('order', newSorting.order);
+    params.set('page', '1');
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: params.toString(),
+      },
+      { replace: true }
+    );
   }
 
   return (
@@ -231,12 +340,7 @@ const Images = () => {
           </div>
         </div>
       </div>
-      <SortingControls
-        activeSort={activeSort}
-        onSortChange={(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') =>
-          handleSortChange(option)
-        }
-      />
+      <SortingControls activeSort={getSortOption()} onSortChange={handleSortChange} />
       <FocusCards cards={data} type="category" />
       <div className="mt-10">
         <Pagination>

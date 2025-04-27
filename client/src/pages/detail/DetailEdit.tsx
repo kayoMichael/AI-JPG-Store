@@ -123,7 +123,7 @@ const DetailEdit = ({ image, handleSwitch, userId }: Props) => {
       .delete(`/images/delete/${image._id}`)
       .then(() => {
         setLoading((state) => ({ ...state, delete: false }));
-        navigate(`/images/${userId}/collection?refetch=true&toast=true`);
+        navigate(`/images/${userId}/collection?refetch=true&toast=delete`);
       })
       .catch(() => {
         setLoading((state) => ({ ...state, delete: false }));

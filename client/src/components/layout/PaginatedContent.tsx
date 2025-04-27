@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import SortingControls from '@/components/layout/FeatureButton';
+import SortingControls, { SortOption } from '@/components/layout/FeatureButton';
 import AllImagesSkeleton from '@/components/skeleton/AllImageSkeleton';
 import {
   Pagination,
@@ -16,7 +16,7 @@ interface PaginatedContentProps<T> {
   title: string;
   data: T[];
   isLoading: boolean;
-  activeSort: 'newest' | 'oldest' | 'alphabetical' | 'trending';
+  activeSort: SortOption;
   pagination?: {
     currentPage: number;
     totalPages: number;
@@ -24,7 +24,7 @@ interface PaginatedContentProps<T> {
     hasPrevPage: boolean;
   };
   onPageChange: (page: number) => void;
-  onSortChange: (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => void;
+  onSortChange: (option: SortOption) => void;
   renderContent: (data: T[]) => ReactNode;
 }
 

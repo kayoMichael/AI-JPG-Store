@@ -2,6 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
+import { SortOption } from '@/components/layout/FeatureButton';
 
 interface PaginationState {
   currentPage: number;
@@ -38,13 +41,73 @@ export const usePagination = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>(initialSort);
   const effectiveUserIdRef = useRef(userId);
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const page = params.get('page');
+    const sort = params.get('sortBy');
+    const order = params.get('order');
+    if (page && /^\d+$/.test(page)) {
+      setCurrentPage(Number(page));
+    } else {
+      setCurrentPage(1);
+      params.set('page', '1');
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+    if (sort === 'lexicographical' || sort === 'createdAt' || sort === 'likes') {
+      setSorting((prev) => ({
+        ...prev,
+        sortBy: sort,
+      }));
+    } else {
+      setSorting((prev) => ({
+        ...prev,
+        sortBy: initialSort.sortBy,
+      }));
+      params.set('sortBy', initialSort.sortBy);
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+    if (order === 'asc' || order === 'desc') {
+      setSorting((prev) => ({
+        ...prev,
+        order,
+      }));
+    } else {
+      setSorting((prev) => ({
+        ...prev,
+        order: initialSort.order,
+      }));
+      params.set('order', initialSort.order);
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+  }, [location.search, location.pathname, navigate, setCurrentPage, setSorting, initialSort]);
+
   useEffect(() => {
     if (userId) {
       effectiveUserIdRef.current = userId;
     }
   }, [userId]);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: [queryKey, location.pathname, currentPage, sorting],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -69,6 +132,21 @@ export const usePagination = ({
     refetchOnWindowFocus: false,
   });
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.has('refetch')) {
+      refetch();
+      params.delete('refetch');
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+  }, [location.search, location.pathname, navigate, refetch]);
+
   const pagination = data?.pagination as PaginationState;
 
   useEffect(() => {
@@ -79,7 +157,16 @@ export const usePagination = ({
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= (pagination?.totalPages || 1)) {
+      const params = new URLSearchParams(location.search);
+      params.set('page', page.toString());
       setCurrentPage(page);
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -89,16 +176,38 @@ export const usePagination = ({
     }
   };
 
-  const handleSortChange = (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => {
+  const handleSortChange = (option: SortOption) => {
+    let newSorting: SortingState;
+
     if (option === 'oldest') {
-      setSorting({ sortBy: 'createdAt', order: 'asc' });
+      newSorting = { sortBy: 'createdAt', order: 'asc' };
     } else if (option === 'newest') {
-      setSorting({ sortBy: 'createdAt', order: 'desc' });
+      newSorting = { sortBy: 'createdAt', order: 'desc' };
     } else if (option === 'alphabetical') {
-      setSorting({ sortBy: 'lexicographical', order: 'asc' });
+      newSorting = { sortBy: 'lexicographical', order: 'asc' };
+    } else if (option === 'reverseAlphabetical') {
+      newSorting = { sortBy: 'lexicographical', order: 'desc' };
     } else if (option === 'trending') {
-      setSorting({ sortBy: 'likes', order: 'desc' });
+      newSorting = { sortBy: 'likes', order: 'desc' };
+    } else {
+      newSorting = { sortBy: 'createdAt', order: 'desc' };
     }
+    setSorting(newSorting);
+
+    const params = new URLSearchParams(location.search);
+    params.set('sortBy', newSorting.sortBy);
+    params.set('order', newSorting.order);
+
+    params.set('page', '1');
+    setCurrentPage(1);
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: params.toString(),
+      },
+      { replace: true }
+    );
   };
 
   return {

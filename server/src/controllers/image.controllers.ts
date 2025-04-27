@@ -4,7 +4,13 @@ import OpenAI from 'openai';
 
 import { env } from '../config/env.js';
 import { uploadToGCS } from '../config/storage.js';
-import ImageModel, { RegisterImageSchema, Category, IPopulatedImage } from '../models/Image.js';
+import ImageModel, {
+  RegisterImageSchema,
+  Category,
+  IPopulatedImage,
+  UpdateImageSchema,
+} from '../models/Image.js';
+import LikeModel from '../models/Likes.js';
 import UserModel from '../models/User.js';
 import { getEnumValue } from '../utils/enum.js';
 
@@ -278,10 +284,42 @@ export const getAllImages = async (req: Request, res: Response) => {
   }
 };
 
+export const updateImage = async (req: Request, res: Response) => {
+  const { title, category, aiModel, description, visibility } = UpdateImageSchema.parse(req.body);
+  const userId = req.session.userId;
+  const { imageId } = req.params;
+  try {
+    const result = await ImageModel.findOneAndUpdate(
+      { _id: imageId, authorId: userId },
+      {
+        $set: {
+          title,
+          category,
+          aiModel: String(aiModel),
+          description,
+          visibility,
+          updatedAt: new Date(),
+        },
+      },
+      { new: true }
+    );
+    if (!result) {
+      res.status(404).json({ error: 'Image not found or unauthorized' });
+      return;
+    }
+
+    res.status(200).json({ success: true, image: result });
+  } catch (error) {
+    console.error('Error updating image:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 export const deleteImage = async (req: Request, res: Response) => {
   const { imageId } = req.params;
   try {
     const image = await ImageModel.findByIdAndDelete(imageId);
+    await LikeModel.deleteMany({ imageId });
     if (!image) {
       res.status(404).json({ error: 'Image not found' });
       return;

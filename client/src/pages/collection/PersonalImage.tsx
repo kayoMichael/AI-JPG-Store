@@ -1,21 +1,52 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
+import { SortOption } from '@/components/layout/FeatureButton';
 import { PaginatedContent } from '@/components/layout/PaginatedContent';
 import { FocusCards, Card } from '@/components/ui/focusCards';
 import { useAuth } from '@/context/AuthContext';
 import { usePagination } from '@/hooks/use-pagination';
+import { useToast } from '@/hooks/use-toast';
 const PersonalImages = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const { toast } = useToast();
   const navigate = useNavigate();
   useEffect(() => {
     if (!user) {
       navigate('/');
     }
   });
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
-    'newest'
-  );
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.has('toast')) {
+      const toastType = params.get('toast');
+      if (toastType === 'delete') {
+        toast({
+          title: 'Image Deleted',
+          description: 'Your image has been deleted successfully.',
+          variant: 'default',
+        });
+      } else if (toastType === 'create') {
+        toast({
+          title: 'Image Created',
+          description: 'Your image has been created successfully.',
+          variant: 'default',
+        });
+      }
+      params.delete('toast');
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+  }, [location.search, location.pathname, toast, navigate]);
+
+  const [activeSort, setActiveSort] = useState<SortOption>('newest');
 
   const { data, isLoading, pagination, handlePageChange, handleSortChange } = usePagination({
     queryKey: 'Personal Images',
@@ -24,7 +55,7 @@ const PersonalImages = () => {
     userId: user?.id,
   });
 
-  const handleSort = (option: 'newest' | 'oldest' | 'alphabetical' | 'trending') => {
+  const handleSort = (option: SortOption) => {
     setActiveSort(option);
     handleSortChange(option);
   };

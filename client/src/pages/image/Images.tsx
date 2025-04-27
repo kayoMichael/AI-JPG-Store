@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import Footer from '@/components/common/Footer';
 import DynamicCover from '@/components/layout/DynamicCover';
 import SortingControls from '@/components/layout/FeatureButton';
+import { SortOption } from '@/components/layout/FeatureButton';
 import AllImagesSkeleton from '@/components/skeleton/AllImageSkeleton';
 import { FocusCards } from '@/components/ui/focusCards';
 import {
@@ -19,15 +20,17 @@ import {
 } from '@/components/ui/pagination';
 import { capitalize } from '@/utils/capitalise';
 
+interface SortingState {
+  sortBy: string;
+  order: string;
+}
+
 const Images = () => {
   const { category } = useParams<{ category: string }>();
   const [uniqueAuthors, setUniqueAuthors] = useState<number>(0);
   const [totalLikes, setTotalLikes] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [activeSort, setActiveSort] = useState<'newest' | 'oldest' | 'alphabetical' | 'trending'>(
-    'newest'
-  );
-  const [sorting, setSorting] = useState<{ sortBy: string; order: string }>({
+  const [sorting, setSorting] = useState<SortingState>({
     sortBy: 'createdAt',
     order: 'desc',
   });
@@ -40,6 +43,19 @@ const Images = () => {
     hasPrevPage: boolean;
   }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const getSortOption = (): SortOption => {
+    const { sortBy, order } = sorting;
+
+    if (sortBy === 'createdAt' && order === 'desc') return 'newest';
+    if (sortBy === 'createdAt' && order === 'asc') return 'oldest';
+    if (sortBy === 'lexicographical' && order === 'asc') return 'alphabetical';
+    if (sortBy === 'lexicographical' && order === 'desc') return 'reverseAlphabetical';
+    if (sortBy === 'likes' && order === 'desc') return 'trending';
+
+    return 'newest';
+  };
 
   useEffect(() => {
     if (!category) {
@@ -47,8 +63,67 @@ const Images = () => {
     }
   }, [category, navigate]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const page = params.get('page');
+    const sort = params.get('sortBy');
+    const order = params.get('order');
+
+    if (page && /^\d+$/.test(page)) {
+      setCurrentPage(Number(page));
+    } else {
+      setCurrentPage(1);
+      params.set('page', '1');
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+    if (sort === 'lexicographical' || sort === 'createdAt' || sort === 'likes') {
+      setSorting((prev) => ({
+        ...prev,
+        sortBy: sort,
+      }));
+    } else {
+      params.set('sortBy', 'createdAt');
+      setSorting((prev) => ({
+        ...prev,
+        sortBy: 'createdAt',
+      }));
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+    if (order === 'asc' || order === 'desc') {
+      setSorting((prev) => ({
+        ...prev,
+        order,
+      }));
+    } else {
+      params.set('order', 'desc');
+      setSorting((prev) => ({
+        ...prev,
+        order: 'desc',
+      }));
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+    }
+  }, [location.search, location.pathname, navigate]);
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['categoryImages', currentPage, sorting],
+    queryKey: ['categoryImages', category, currentPage, sorting],
     queryFn: async () => {
       const response = await axios
         .get(
@@ -68,8 +143,8 @@ const Images = () => {
       setTotalLikes(totalLikes);
       return images;
     },
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 60 * 4,
+    gcTime: 1000 * 60 * 7,
     refetchOnWindowFocus: false,
   });
 
@@ -79,27 +154,19 @@ const Images = () => {
     }
   }, [isError, navigate]);
 
-  if (isLoading) {
-    return (
-      <>
-        <DynamicCover />
-        <div className="mt-96"></div>
-        <AllImagesSkeleton activeSort={activeSort} onSortChange={handleSortChange} />
-      </>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-[500px]">
-        <p className="text-white">No images found for this category.</p>
-      </div>
-    );
-  }
-
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= (pagination?.totalPages || 1)) {
+      const params = new URLSearchParams(location.search);
+      params.set('page', page.toString());
       setCurrentPage(page);
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString(),
+        },
+        { replace: true }
+      );
+
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -110,36 +177,30 @@ const Images = () => {
   };
 
   const renderPaginationItems = () => {
-    if (!pagination || pagination.totalPages === 1) return null;
+    if (!pagination || pagination.totalPages <= 1) return null;
 
     const items = [];
-
+    const { currentPage, totalPages, hasPrevPage, hasNextPage } = pagination;
     items.push(
       <PaginationItem key="prev" className="cursor-pointer">
         <PaginationPrevious
           onClick={() => handlePageChange(currentPage - 1)}
-          className={!pagination.hasPrevPage ? 'pointer-events-none opacity-50' : ''}
+          className={!hasPrevPage ? 'pointer-events-none opacity-50' : ''}
         />
       </PaginationItem>
     );
-
-    items.push(
-      <PaginationItem key={1}>
-        <PaginationLink onClick={() => handlePageChange(1)} isActive={pagination.currentPage === 1}>
-          1
+    const createPageItem = (pageNum: number) => (
+      <PaginationItem key={pageNum} className="cursor-pointer">
+        <PaginationLink
+          onClick={() => handlePageChange(pageNum)}
+          isActive={currentPage === pageNum}
+        >
+          {pageNum}
         </PaginationLink>
       </PaginationItem>
     );
-
-    if (pagination.currentPage !== 1 && pagination.currentPage !== pagination.totalPages) {
-      items.push(
-        <PaginationItem key={pagination.currentPage}>
-          <PaginationLink isActive>{pagination.currentPage}</PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (pagination.currentPage < pagination.totalPages - 2) {
+    items.push(createPageItem(1));
+    if (currentPage > 3) {
       items.push(
         <PaginationItem key="ellipsis-1">
           <PaginationEllipsis />
@@ -147,41 +208,85 @@ const Images = () => {
       );
     }
 
-    if (pagination.totalPages > 1) {
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
+      if (i === 1 || i === totalPages) continue;
+      items.push(createPageItem(i));
+    }
+    if (currentPage < totalPages - 2) {
       items.push(
-        <PaginationItem key={pagination.totalPages}>
-          <PaginationLink
-            onClick={() => handlePageChange(pagination.totalPages)}
-            isActive={pagination.currentPage === pagination.totalPages}
-          >
-            {pagination.totalPages}
-          </PaginationLink>
+        <PaginationItem key="ellipsis-2">
+          <PaginationEllipsis />
         </PaginationItem>
       );
     }
 
-    if (pagination.hasNextPage) {
-      items.push(
-        <PaginationItem key="next" className="cursor-pointer">
-          <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
-        </PaginationItem>
-      );
+    if (totalPages > 1) {
+      items.push(createPageItem(totalPages));
     }
+
+    items.push(
+      <PaginationItem key="next" className="cursor-pointer">
+        <PaginationNext
+          onClick={() => handlePageChange(currentPage + 1)}
+          className={!hasNextPage ? 'pointer-events-none opacity-50' : ''}
+        />
+      </PaginationItem>
+    );
 
     return items;
   };
 
-  function handleSortChange(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') {
-    setActiveSort(option);
+  function handleSortChange(option: SortOption) {
+    let newSorting: SortingState;
+
     if (option === 'oldest') {
-      setSorting({ sortBy: 'createdAt', order: 'asc' });
+      newSorting = { sortBy: 'createdAt', order: 'asc' };
     } else if (option === 'newest') {
-      setSorting({ sortBy: 'createdAt', order: 'desc' });
+      newSorting = { sortBy: 'createdAt', order: 'desc' };
     } else if (option === 'alphabetical') {
-      setSorting({ sortBy: 'lexicographical', order: 'asc' });
+      newSorting = { sortBy: 'lexicographical', order: 'asc' };
+    } else if (option === 'reverseAlphabetical') {
+      newSorting = { sortBy: 'lexicographical', order: 'desc' };
     } else if (option === 'trending') {
-      setSorting({ sortBy: 'likes', order: 'desc' });
+      newSorting = { sortBy: 'likes', order: 'desc' };
+    } else {
+      newSorting = { sortBy: 'createdAt', order: 'desc' };
     }
+
+    const params = new URLSearchParams(location.search);
+    params.set('sortBy', newSorting.sortBy);
+    params.set('order', newSorting.order);
+    params.set('page', '1');
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: params.toString(),
+      },
+      { replace: true }
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <>
+        <DynamicCover />
+        <div className="mt-96"></div>
+        <AllImagesSkeleton activeSort={getSortOption()} onSortChange={handleSortChange} />
+      </>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <p className="text-white">No images found for this category.</p>
+      </div>
+    );
   }
 
   return (
@@ -231,12 +336,7 @@ const Images = () => {
           </div>
         </div>
       </div>
-      <SortingControls
-        activeSort={activeSort}
-        onSortChange={(option: 'newest' | 'oldest' | 'alphabetical' | 'trending') =>
-          handleSortChange(option)
-        }
-      />
+      <SortingControls activeSort={getSortOption()} onSortChange={handleSortChange} />
       <FocusCards cards={data} type="category" />
       <div className="mt-10">
         <Pagination>

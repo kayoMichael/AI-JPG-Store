@@ -4,7 +4,12 @@ import OpenAI from 'openai';
 
 import { env } from '../config/env.js';
 import { uploadToGCS } from '../config/storage.js';
-import ImageModel, { RegisterImageSchema, Category, IPopulatedImage } from '../models/Image.js';
+import ImageModel, {
+  RegisterImageSchema,
+  Category,
+  IPopulatedImage,
+  UpdateImageSchema,
+} from '../models/Image.js';
 import UserModel from '../models/User.js';
 import { getEnumValue } from '../utils/enum.js';
 
@@ -274,6 +279,30 @@ export const getAllImages = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error fetching images:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const updateImage = async (req: Request, res: Response) => {
+  const { imageId, title, category, aiModel, description, visibility } = UpdateImageSchema.parse(
+    req.body
+  );
+  const userId = req.session.userId;
+  try {
+    const result = await ImageModel.findOneAndUpdate(
+      { _id: imageId, authorId: userId },
+      {
+        $set: { title, category, aiModel, description, visibility, updatedAt: new Date() },
+      },
+      { new: true }
+    );
+    if (!result) {
+      return res.status(404).json({ error: 'Image not found or unauthorized' });
+    }
+
+    res.json({ success: true, image: result });
+  } catch (error) {
+    console.error('Error updating image:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

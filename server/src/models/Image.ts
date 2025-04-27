@@ -69,6 +69,15 @@ export const RegisterImageSchema = z.object({
   visibility: z.nativeEnum(Visibility),
 });
 
+export const UpdateImageSchema = z.object({
+  imageId: z.string(),
+  title: z.string().optional(),
+  category: z.nativeEnum(Category).optional(),
+  aiModel: z.string().optional(),
+  description: z.string().optional(),
+  visibility: z.nativeEnum(Visibility).optional(),
+});
+
 ImageSchema.index({ category: 1, createdAt: 1 }, { background: true });
 ImageSchema.index({ authorId: 1, createdAt: 1 }, { background: true });
 ImageSchema.index({ name: 1 }, { background: true });

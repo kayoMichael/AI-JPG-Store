@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import DetailEdit from './DetailEdit';
-import DetailView from './detailView';
+import DetailView from './DetailView';
 
 import Image from '@/components/common/Image';
 import DetailSkeleton from '@/components/skeleton/DetailSkeleton';

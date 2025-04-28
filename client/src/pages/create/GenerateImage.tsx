@@ -16,15 +16,39 @@ interface Props {
   setValue: UseFormSetValue<FormValues>;
   reset: UseFormReset<FormValues>;
   setIsAICreated: (value: boolean) => void;
+  apiLimit: {
+    limit: number | null;
+    reset: number | null;
+  };
+  setApiLimit: React.Dispatch<
+    React.SetStateAction<{
+      limit: number | null;
+      reset: number | null;
+    }>
+  >;
 }
 
-const GenerateImage = ({ register, watch, setValue, reset, setIsAICreated }: Props) => {
+const GenerateImage = ({
+  register,
+  watch,
+  setValue,
+  reset,
+  setIsAICreated,
+  apiLimit,
+  setApiLimit,
+}: Props) => {
   const file = watch('image');
   const preview = watch('imagePreview');
   const [activeTab, setActiveTab] = useState<string>('upload');
   const [prompt, setPrompt] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (apiLimit.limit === 0) {
+      setGenerationError('API limit reached. Please Wait for 24 hours to generate more images.');
+    }
+  }, [apiLimit]);
 
   const handlePreview = (file: File) => {
     if (file) {
@@ -60,8 +84,11 @@ const GenerateImage = ({ register, watch, setValue, reset, setIsAICreated }: Pro
     try {
       setIsGenerating(true);
       setGenerationError(null);
-      const response = await axios.post('/images/generate', { prompt });
-      const imageData = response.data.imageData;
+      const response = await Promise.all([
+        axios.post('/images/generate', { prompt }),
+        axios.post('/user/limit/decrement'),
+      ]);
+      const imageData = response[0].data.imageData;
       if (!imageData) {
         setGenerationError('Failed to generate image');
         return;
@@ -91,6 +118,10 @@ const GenerateImage = ({ register, watch, setValue, reset, setIsAICreated }: Pro
         shouldDirty: true,
         shouldTouch: true,
       });
+      setApiLimit((prev) => ({
+        ...prev,
+        limit: prev.limit ? prev.limit - 1 : 0,
+      }));
     } catch (error) {
       setGenerationError(error instanceof Error ? error.message : 'Failed to generate image');
     } finally {
@@ -192,7 +223,9 @@ const GenerateImage = ({ register, watch, setValue, reset, setIsAICreated }: Pro
                 />
                 <Button
                   onClick={handleGenerateImage}
-                  disabled={isGenerating || !prompt.trim() || preview != null}
+                  disabled={
+                    isGenerating || !prompt.trim() || preview != null || apiLimit.limit === 0
+                  }
                 >
                   {isGenerating ? (
                     <>
@@ -205,9 +238,17 @@ const GenerateImage = ({ register, watch, setValue, reset, setIsAICreated }: Pro
                 </Button>
               </div>
 
-              {generationError && (
+              {generationError ? (
                 <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
                   {generationError}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  <span className="text-red-500 font-semibold">Note:</span> You can currently
+                  generate <span className="text-red-500 font-semibold">{apiLimit.limit}</span>{' '}
+                  images today.
+                  <br />
+                  Please wait {apiLimit.reset} hours to generate more images.
                 </div>
               )}
 

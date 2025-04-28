@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import Categories from '../categories/Categories';
 
@@ -50,6 +52,13 @@ const Dashboard = () => {
       <div className="mt-24 flex flex-col gap-8">
         <div className="text-5xl font-semibold">Recently Shared</div>
         <ImageCard images={data?.regularImages} />
+        <Link
+          to="/images/all"
+          className="flex justify-end items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900"
+        >
+          See More
+          <ArrowRight />
+        </Link>
         <Categories />
       </div>
     </div>

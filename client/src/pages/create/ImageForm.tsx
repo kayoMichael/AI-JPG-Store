@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { AlertCircle, ImagePlus } from 'lucide-react';
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -78,7 +79,23 @@ const ImageForm = ({ userId }: { userId: string }) => {
   const [isAICreated, setIsAICreated] = useState(false);
   const [open, setOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [apiLimit, setApiLimit] = useState<{ limit: number | null; reset: number | null }>({
+    limit: null,
+    reset: null,
+  });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchLimit = async () => {
+      try {
+        const response = await axios.get('/user/limit').then((res) => res.data);
+        setApiLimit({ limit: response.remainingLimit, reset: response.resetsIn.hours });
+      } catch {
+        navigate('/error');
+      }
+    };
+    fetchLimit();
+  }, [navigate]);
 
   const {
     register,
@@ -190,6 +207,8 @@ const ImageForm = ({ userId }: { userId: string }) => {
               setValue={setValue}
               setIsAICreated={setIsAICreated}
               reset={reset}
+              apiLimit={apiLimit}
+              setApiLimit={setApiLimit}
             />
             {errors.image && <span className="text-red-500 text-sm">{errors.image.message}</span>}
           </div>

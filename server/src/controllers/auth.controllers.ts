@@ -11,6 +11,7 @@ export const register = async (req: Request, res: Response) => {
       email,
       password: await hashPassword(password),
       createdAt: new Date(),
+      limit: 3,
     });
     res.status(201).json({ userId: user._id, email: user.email });
   } catch (error) {

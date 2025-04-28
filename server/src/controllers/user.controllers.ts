@@ -89,3 +89,62 @@ export const updateUserProfileImage = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Upload failed' });
   }
 };
+
+export const getUserLimit = async (req: Request, res: Response) => {
+  try {
+    const userId = req.session.userId;
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    await user.checkAndResetLimit();
+
+    const timeUntilReset = user.getTimeUntilReset();
+
+    res.status(200).json({
+      remainingLimit: user.limit,
+      resetsIn: {
+        milliseconds: timeUntilReset,
+        seconds: Math.floor(timeUntilReset / 1000),
+        minutes: Math.floor(timeUntilReset / (1000 * 60)),
+        hours: Math.floor(timeUntilReset / (1000 * 60 * 60)),
+      },
+    });
+  } catch (error) {
+    console.error('Get user limit error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const useUserLimit = async (req: Request, res: Response) => {
+  try {
+    const userId = req.session.userId;
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const success = await user.useLimit();
+    if (!success) {
+      res.status(403).json({ error: 'Daily limit reached' });
+      return;
+    }
+    const timeUntilReset = user.getTimeUntilReset();
+
+    res.status(200).json({
+      success: true,
+      remainingLimit: user.limit,
+      resetsIn: {
+        milliseconds: timeUntilReset,
+        seconds: Math.floor(timeUntilReset / 1000),
+        minutes: Math.floor(timeUntilReset / (1000 * 60)),
+        hours: Math.floor(timeUntilReset / (1000 * 60 * 60)),
+      },
+    });
+  } catch (error) {
+    console.error('Use limit error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

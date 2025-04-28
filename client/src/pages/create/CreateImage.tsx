@@ -16,6 +16,7 @@ const CreateImage = () => {
       navigate('/login');
     }
   }, [user, navigate]);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="flex gap-2 items-center px-4 sm:px-6 lg:px-8 mt-8">
@@ -64,7 +65,9 @@ const CreateImage = () => {
                       <ClipboardList className="w-6 h-6 text-gray-600 flex-shrink-0" />
                       <div>
                         <h3 className="text-lg font-medium text-gray-700">Manage Image settings</h3>
-                        <p className="text-gray-600">Delete/Create new Images Instantaneously</p>
+                        <p className="text-gray-600">
+                          Delete/Edit/Create new Images Instantaneously
+                        </p>
                       </div>
                     </div>
                     <div className="flex gap-4">

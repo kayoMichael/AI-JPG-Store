@@ -30,15 +30,37 @@ make dev
 ## File Structure
 ```
 .
-├── REAME.md
+├── README.md
 ├── client
 │   ├── README.md
 │   ├── components.json
+│   ├── dist
+│   │   ├── assets
+│   │   │   ├── index-CEkiWjTn.css
+│   │   │   └── index-D2SywUXl.js
+│   │   ├── index.html
+│   │   └── vite.svg
 │   ├── dockerfile
 │   ├── index.html
 │   ├── nginx.conf
 │   ├── package.json
 │   ├── postcss.config.js
+│   ├── public
+│   │   ├── category
+│   │   │   ├── cyberpunk.jpg
+│   │   │   ├── photography.jpg
+│   │   │   └── space.jpg
+│   │   ├── cover
+│   │   │   ├── anime.jpg
+│   │   │   ├── baroque.png
+│   │   │   ├── contemporary.webp
+│   │   │   ├── cyberpunk.png
+│   │   │   ├── impressionism.jpg
+│   │   │   ├── photography.webp
+│   │   │   ├── renaissance.jpg
+│   │   │   └── space.png
+│   │   ├── default.webp
+│   │   └── vite.svg
 │   ├── src
 │   │   ├── App.css
 │   │   ├── App.tsx
@@ -47,6 +69,7 @@ make dev
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── common
+│   │   │   │   ├── Footer.tsx
 │   │   │   │   ├── Image.tsx
 │   │   │   │   ├── Logo.tsx
 │   │   │   │   ├── NavButton.tsx
@@ -61,12 +84,17 @@ make dev
 │   │   │   │   ├── InputField.tsx
 │   │   │   │   ├── Markdown.tsx
 │   │   │   │   ├── Navbar.tsx
+│   │   │   │   ├── PaginatedContent.tsx
 │   │   │   │   ├── Profile.tsx
 │   │   │   │   └── SettingsLayout.tsx
 │   │   │   ├── skeleton
+│   │   │   │   ├── AllImageSkeleton.tsx
+│   │   │   │   ├── DashboardSkeleton.tsx
+│   │   │   │   ├── DetailSkeleton.tsx
 │   │   │   │   └── NavbarSkeleton.tsx
 │   │   │   └── ui
 │   │   │       ├── avatar.tsx
+│   │   │       ├── badge.tsx
 │   │   │       ├── button.tsx
 │   │   │       ├── card.tsx
 │   │   │       ├── carousel.tsx
@@ -80,10 +108,13 @@ make dev
 │   │   │       ├── input.tsx
 │   │   │       ├── label.tsx
 │   │   │       ├── pagination.tsx
+│   │   │       ├── popover.tsx
+│   │   │       ├── scroll-area.tsx
 │   │   │       ├── select.tsx
 │   │   │       ├── separator.tsx
 │   │   │       ├── skeleton.tsx
 │   │   │       ├── sonner.tsx
+│   │   │       ├── switch.tsx
 │   │   │       ├── tabs.tsx
 │   │   │       ├── textarea.tsx
 │   │   │       ├── toast.tsx
@@ -100,6 +131,7 @@ make dev
 │   │   │   └── CategoryContext.ts
 │   │   ├── hooks
 │   │   │   ├── use-outside-click.ts
+│   │   │   ├── use-pagination.ts
 │   │   │   ├── use-toast.ts
 │   │   │   └── use-validate.ts
 │   │   ├── index.css
@@ -114,16 +146,23 @@ make dev
 │   │   │   ├── all-images
 │   │   │   │   └── AllImages.tsx
 │   │   │   ├── auth
+│   │   │   │   ├── AccountCreated.tsx
 │   │   │   │   ├── Login.tsx
 │   │   │   │   ├── Signout.tsx
 │   │   │   │   └── Signup.tsx
 │   │   │   ├── categories
 │   │   │   │   ├── Categories.tsx
 │   │   │   │   └── ImageCarousel.tsx
+│   │   │   ├── collection
+│   │   │   │   └── PersonalImage.tsx
 │   │   │   ├── create
 │   │   │   │   ├── CreateImage.tsx
-│   │   │   │   ├── FileUploadArea.tsx
+│   │   │   │   ├── GenerateImage.tsx
 │   │   │   │   └── ImageForm.tsx
+│   │   │   ├── detail
+│   │   │   │   ├── DetailEdit.tsx
+│   │   │   │   ├── DetailView.tsx
+│   │   │   │   └── ImageDetail.tsx
 │   │   │   ├── error
 │   │   │   │   └── Error.tsx
 │   │   │   ├── image
@@ -134,6 +173,7 @@ make dev
 │   │   │       ├── ImageCard.tsx
 │   │   │       └── ProductCard.tsx
 │   │   ├── types
+│   │   │   ├── image.ts
 │   │   │   └── user.ts
 │   │   ├── utils
 │   │   │   ├── capitalise.ts
@@ -190,4 +230,6 @@ make dev
     │       ├── enum.ts
     │       └── password.ts
     └── tsconfig.json
+
+45 directories, 156 files
 ```

@@ -54,9 +54,9 @@ make build
 ## Deploy
 The application is deployed via Github actions.
 
-After cloning the web, create a new Repo from the cloned code.
+After cloning the Repo, create a new Repo from the cloned code.
 
-Add the following Secrets and variables to the Repo
+Add/Change the following Secrets and variables to the Repo
 
 ## Secrets
 1. GCP_SA_KEY - Google Cloud Platform Service Account key in JSON format
@@ -82,6 +82,9 @@ Add the following Secrets and variables to the Repo
 4. SERVER_IMAGE - Server Docker image repository path
 5. PROD_CLIENT_URL - Production client URL
 6. PROD_SERVER_URL - Production server URL
+
+
+
 
 ## File Structure
 ```

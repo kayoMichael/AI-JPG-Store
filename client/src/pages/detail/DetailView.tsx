@@ -25,7 +25,7 @@ import { cn } from '@/utils/merge';
 interface Props {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   imageId?: string;
-  user?: User;
+  user: User | null;
   liked: boolean;
   setLiked: React.Dispatch<React.SetStateAction<boolean>>;
   currentUser?: {

@@ -24,7 +24,7 @@ import { capitalize } from '@/utils/capitalise';
 
 export default function ImageDetail() {
   const { pathname } = useLocation();
-  const { user } = useAuth();
+  const user = useAuth((state) => state.user);
   const [liked, setLiked] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -128,6 +128,7 @@ export default function ImageDetail() {
               currentUser={currentUser}
               personalConfig={personalConfig}
               data={data!}
+              user={user}
               handleSwitch={handleSwitch}
             />
           )}

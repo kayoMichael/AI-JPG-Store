@@ -48,18 +48,14 @@ export const usePagination = ({
     const page = params.get('page');
     const sort = params.get('sortBy');
     const order = params.get('order');
+    let needsUpdate = false;
+    const newParams = new URLSearchParams(params.toString());
     if (page && /^\d+$/.test(page)) {
       setCurrentPage(Number(page));
     } else {
       setCurrentPage(1);
-      params.set('page', '1');
-      navigate(
-        {
-          pathname: location.pathname,
-          search: params.toString(),
-        },
-        { replace: true }
-      );
+      newParams.set('page', '1');
+      needsUpdate = true;
     }
     if (sort === 'lexicographical' || sort === 'createdAt' || sort === 'likes') {
       setSorting((prev) => ({
@@ -71,14 +67,8 @@ export const usePagination = ({
         ...prev,
         sortBy: initialSort.sortBy,
       }));
-      params.set('sortBy', initialSort.sortBy);
-      navigate(
-        {
-          pathname: location.pathname,
-          search: params.toString(),
-        },
-        { replace: true }
-      );
+      newParams.set('sortBy', initialSort.sortBy);
+      needsUpdate = true;
     }
     if (order === 'asc' || order === 'desc') {
       setSorting((prev) => ({
@@ -88,18 +78,22 @@ export const usePagination = ({
     } else {
       setSorting((prev) => ({
         ...prev,
+        sortBy: initialSort.sortBy,
         order: initialSort.order,
       }));
-      params.set('order', initialSort.order);
+      newParams.set('order', initialSort.order);
+      needsUpdate = true;
+    }
+    if (needsUpdate) {
       navigate(
         {
           pathname: location.pathname,
-          search: params.toString(),
+          search: newParams.toString(),
         },
         { replace: true }
       );
     }
-  }, [location.search, location.pathname, navigate, setCurrentPage, setSorting, initialSort]);
+  }, []);
 
   useEffect(() => {
     if (userId) {

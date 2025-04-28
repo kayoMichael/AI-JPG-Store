@@ -21,24 +21,102 @@ A Full Stack MERN Stack App allowing users to View and Share their own AI Genera
 </div>
 
 ## Running Local Server
+
+### Prerequisites
+- Docker and Docker Compose installed on your system
+- Git installed on your system
+
+### Setup Steps
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/kayoMichael/AI-JPG-Store.git
+   cd AI-JPG-Store
+   ```
+
+2. Set up environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+   Fill in the required variables
+
+3. Start up a Docker Daemon
+
+4. Start the development server:
+   ```bash
+   make dev
+   ```
+
+## Build
 ```
-git clone https://github.com/kayoMichael/AI-JPG-Store.git
-cd AI-JPG-Store
-make dev
+make build
 ```
+
+## Deploy
+The application is deployed via Github actions.
+
+After cloning the web, create a new Repo from the cloned code.
+
+Add the following Secrets and variables to the Repo
+
+## Secrets
+1. GCP_SA_KEY - Google Cloud Platform Service Account key in JSON format
+2. MONGO_DB_CONNECTION_KEY - MongoDB connection string
+3. REDIS_HOST - Redis host address
+4. REDIS_PASSWORD - Redis password
+5. SESSION_SECRET_KEY - Secret key for session management
+6. GCS_SERVICE_ACCOUNT - Google Cloud Storage service account credentials
+7. GCS_BUCKET_NAME - Google Cloud Storage bucket name
+8. OPENAI_API_KEY - OpenAI API key
+
+## Variables
+
+1. NODE_ENV - Node.js environment
+2. REDIS_PORT - Redis port number
+3. REDIS_USERNAME - Redis username
+
+## Hardcoded configs in the workflow file
+
+1. PROJECT_ID - Google Cloud Project ID (currently "mern-stack-app-447200")
+2. REGION - Google Cloud region (currently "northamerica-northeast2")
+3. CLIENT_IMAGE - Client Docker image repository path
+4. SERVER_IMAGE - Server Docker image repository path
+5. PROD_CLIENT_URL - Production client URL
+6. PROD_SERVER_URL - Production server URL
 
 ## File Structure
 ```
 .
-├── REAME.md
+├── README.md
 ├── client
 │   ├── README.md
 │   ├── components.json
+│   ├── dist
+│   │   ├── assets
+│   │   │   ├── index-CEkiWjTn.css
+│   │   │   └── index-D2SywUXl.js
+│   │   ├── index.html
+│   │   └── vite.svg
 │   ├── dockerfile
 │   ├── index.html
 │   ├── nginx.conf
 │   ├── package.json
 │   ├── postcss.config.js
+│   ├── public
+│   │   ├── category
+│   │   │   ├── cyberpunk.jpg
+│   │   │   ├── photography.jpg
+│   │   │   └── space.jpg
+│   │   ├── cover
+│   │   │   ├── anime.jpg
+│   │   │   ├── baroque.png
+│   │   │   ├── contemporary.webp
+│   │   │   ├── cyberpunk.png
+│   │   │   ├── impressionism.jpg
+│   │   │   ├── photography.webp
+│   │   │   ├── renaissance.jpg
+│   │   │   └── space.png
+│   │   ├── default.webp
+│   │   └── vite.svg
 │   ├── src
 │   │   ├── App.css
 │   │   ├── App.tsx
@@ -47,6 +125,7 @@ make dev
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── common
+│   │   │   │   ├── Footer.tsx
 │   │   │   │   ├── Image.tsx
 │   │   │   │   ├── Logo.tsx
 │   │   │   │   ├── NavButton.tsx
@@ -61,12 +140,17 @@ make dev
 │   │   │   │   ├── InputField.tsx
 │   │   │   │   ├── Markdown.tsx
 │   │   │   │   ├── Navbar.tsx
+│   │   │   │   ├── PaginatedContent.tsx
 │   │   │   │   ├── Profile.tsx
 │   │   │   │   └── SettingsLayout.tsx
 │   │   │   ├── skeleton
+│   │   │   │   ├── AllImageSkeleton.tsx
+│   │   │   │   ├── DashboardSkeleton.tsx
+│   │   │   │   ├── DetailSkeleton.tsx
 │   │   │   │   └── NavbarSkeleton.tsx
 │   │   │   └── ui
 │   │   │       ├── avatar.tsx
+│   │   │       ├── badge.tsx
 │   │   │       ├── button.tsx
 │   │   │       ├── card.tsx
 │   │   │       ├── carousel.tsx
@@ -80,10 +164,13 @@ make dev
 │   │   │       ├── input.tsx
 │   │   │       ├── label.tsx
 │   │   │       ├── pagination.tsx
+│   │   │       ├── popover.tsx
+│   │   │       ├── scroll-area.tsx
 │   │   │       ├── select.tsx
 │   │   │       ├── separator.tsx
 │   │   │       ├── skeleton.tsx
 │   │   │       ├── sonner.tsx
+│   │   │       ├── switch.tsx
 │   │   │       ├── tabs.tsx
 │   │   │       ├── textarea.tsx
 │   │   │       ├── toast.tsx
@@ -100,6 +187,7 @@ make dev
 │   │   │   └── CategoryContext.ts
 │   │   ├── hooks
 │   │   │   ├── use-outside-click.ts
+│   │   │   ├── use-pagination.ts
 │   │   │   ├── use-toast.ts
 │   │   │   └── use-validate.ts
 │   │   ├── index.css
@@ -114,16 +202,23 @@ make dev
 │   │   │   ├── all-images
 │   │   │   │   └── AllImages.tsx
 │   │   │   ├── auth
+│   │   │   │   ├── AccountCreated.tsx
 │   │   │   │   ├── Login.tsx
 │   │   │   │   ├── Signout.tsx
 │   │   │   │   └── Signup.tsx
 │   │   │   ├── categories
 │   │   │   │   ├── Categories.tsx
 │   │   │   │   └── ImageCarousel.tsx
+│   │   │   ├── collection
+│   │   │   │   └── PersonalImage.tsx
 │   │   │   ├── create
 │   │   │   │   ├── CreateImage.tsx
-│   │   │   │   ├── FileUploadArea.tsx
+│   │   │   │   ├── GenerateImage.tsx
 │   │   │   │   └── ImageForm.tsx
+│   │   │   ├── detail
+│   │   │   │   ├── DetailEdit.tsx
+│   │   │   │   ├── DetailView.tsx
+│   │   │   │   └── ImageDetail.tsx
 │   │   │   ├── error
 │   │   │   │   └── Error.tsx
 │   │   │   ├── image
@@ -134,6 +229,7 @@ make dev
 │   │   │       ├── ImageCard.tsx
 │   │   │       └── ProductCard.tsx
 │   │   ├── types
+│   │   │   ├── image.ts
 │   │   │   └── user.ts
 │   │   ├── utils
 │   │   │   ├── capitalise.ts
@@ -190,4 +286,6 @@ make dev
     │       ├── enum.ts
     │       └── password.ts
     └── tsconfig.json
+
+45 directories, 156 files
 ```

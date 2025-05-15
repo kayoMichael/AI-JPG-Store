@@ -1,6 +1,11 @@
 # Generative AI Market Place
 A Full Stack MERN Stack App allowing users to View and Share their own AI Generated Image.
 
+## Image Upload Demo
+https://github.com/user-attachments/assets/09ec28d2-430e-4db4-8577-7ae93f91e587
+
+
+
 ## Tech Stack
 <div align="left">
 	<img width="50" src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/react.png" alt="React" title="React"/>
